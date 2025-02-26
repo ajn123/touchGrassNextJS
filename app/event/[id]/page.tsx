@@ -1,5 +1,4 @@
 import { getEvent } from "@/services/api";
-import Link from "next/link";
 import SocialMediaIcon from "@/components/buttons/socialMedia/socialMediaIcon";
 import DateHeader from "@/components/dates/dateHeader";
 
@@ -30,7 +29,7 @@ export default async function EventPage({ params }: { params: { id: string } }) 
                 <div className="top-2 right-2 z-10 flex gap-2">
                     <SocialMediaIcon {...event} />
                 </div>
-                
+
                 <DateHeader {...event} />
                 <div className="prose max-w-none text-black">
                     {event.description}
