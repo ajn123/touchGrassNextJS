@@ -1,7 +1,6 @@
 "use client";
 
 import { getEvent } from "@/services/api";
-import Link from "next/link";
 import SocialMediaIcon from "@/components/buttons/socialMedia/socialMediaIcon";
 import DateHeader from "@/components/dates/dateHeader";
 import { useState, useEffect } from "react";
@@ -11,12 +10,11 @@ type Props = {
     params: Promise<{
         id: string;
     }>;
-    searchParams: { [key: string]: string | string[] | undefined };
 }
 
-export default function EventPage({ params, searchParams }: Props) {
+export default function EventPage({ params }: Props) {
     const resolvedParams = use(params);
-    const [event, setEvent] = useState<any>(null);
+    const [event, setEvent] = useState<Event | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
