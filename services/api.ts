@@ -1,5 +1,5 @@
-const API_URL =  'https://touchgrassdc-production.up.railway.app/api/events';
-const INTERNAL_API_URL = 'https://touchgrassdc-production.up.railway.app';
+const API_URL =  process.env.API_URL;
+const INTERNAL_API_URL = process.env.INTERNAL_API_URL;
 
 import { Event } from '@/types/event';
 
@@ -18,6 +18,7 @@ export const getEvent = async (event_id: string): Promise<Event | null> => {
 };
 
 export const getEvents = async (): Promise<Event[]> => {
+    console.log('Fetching from:', `${INTERNAL_API_URL}/api/events`);
   try {
     const url = typeof window === 'undefined' ? INTERNAL_API_URL : API_URL;
     console.log('Fetching from:', `${url}/api/events`);

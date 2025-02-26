@@ -2,7 +2,6 @@ import { getEvent } from "@/services/api";
 import SocialMediaIcon from "@/components/buttons/socialMedia/socialMediaIcon";
 import DateHeader from "@/components/dates/dateHeader";
 
-
 export type paramsType = Promise<{ id: string }>;
 export default async function EventPage({ params }: { params: paramsType } ) {
     const event = await getEvent((await params).id);
