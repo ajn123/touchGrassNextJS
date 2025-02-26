@@ -1,17 +1,42 @@
+"use client";
+
 import { getEvent } from "@/services/api";
+import Link from "next/link";
 import SocialMediaIcon from "@/components/buttons/socialMedia/socialMediaIcon";
 import DateHeader from "@/components/dates/dateHeader";
+import { useState, useEffect } from "react";
+import { use } from 'react';
 
-// Define the params interface
-interface PageParams {
-  params: {
-    id: string;
-  };
-  searchParams?: { [key: string]: string | string[] | undefined };
+type Props = {
+    params: Promise<{
+        id: string;
+    }>;
+    searchParams: { [key: string]: string | string[] | undefined };
 }
 
-export default async function EventPage({ params }: PageParams) {
-    const event = await getEvent(params.id);
+export default function EventPage({ params, searchParams }: Props) {
+    const resolvedParams = use(params);
+    const [event, setEvent] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchEvent = async () => {
+            try {
+                const data = await getEvent(resolvedParams.id);
+                setEvent(data);
+            } catch (error) {
+                console.error('Error fetching event:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchEvent();
+    }, [resolvedParams.id]);
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
 
     if (!event) {
         return <div>Event not found</div>;
@@ -37,7 +62,6 @@ export default async function EventPage({ params }: PageParams) {
                 <div className="top-2 right-2 z-10 flex gap-2">
                     <SocialMediaIcon {...event} />
                 </div>
-
                 <DateHeader {...event} />
                 <div className="prose max-w-none text-black">
                     {event.description}
