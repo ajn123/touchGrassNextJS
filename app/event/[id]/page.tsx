@@ -2,7 +2,15 @@ import { getEvent } from "@/services/api";
 import SocialMediaIcon from "@/components/buttons/socialMedia/socialMediaIcon";
 import DateHeader from "@/components/dates/dateHeader";
 
-export default async function EventPage({ params }: { params: { id: string } }) {
+// Define the params interface
+interface PageParams {
+  params: {
+    id: string;
+  };
+  searchParams?: { [key: string]: string | string[] | undefined };
+}
+
+export default async function EventPage({ params }: PageParams) {
     const event = await getEvent(params.id);
 
     if (!event) {
