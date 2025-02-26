@@ -1,41 +1,12 @@
-"use client";
-
 import { getEvent } from "@/services/api";
 import SocialMediaIcon from "@/components/buttons/socialMedia/socialMediaIcon";
 import DateHeader from "@/components/dates/dateHeader";
-import { useState, useEffect } from "react";
-import { use } from 'react';
 
-type Props = {
-    params: Promise<{
-        id: string;
-    }>;
-}
 
-export default function EventPage({ params }: Props) {
-    const resolvedParams = use(params);
-    const [event, setEvent] = useState<Event | null>(null);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const fetchEvent = async () => {
-            try {
-                const data = await getEvent(resolvedParams.id);
-                setEvent(data);
-            } catch (error) {
-                console.error('Error fetching event:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchEvent();
-    }, [resolvedParams.id]);
-
-    if (loading) {
-        return <div>Loading...</div>;
-    }
-
+export type paramsType = Promise<{ id: string }>;
+export default async function EventPage({ params }: { params: paramsType } ) {
+    const event = await getEvent((await params).id);
+    
     if (!event) {
         return <div>Event not found</div>;
     }
