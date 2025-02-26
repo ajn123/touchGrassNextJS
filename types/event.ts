@@ -2,6 +2,7 @@ export interface Socials {
     facebook: string;
     instagram: string;
     website: string;
+    meetup: string;
 }
 
 export interface Cost {

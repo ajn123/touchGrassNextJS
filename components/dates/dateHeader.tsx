@@ -12,7 +12,14 @@ export default function DateHeader(event: Event) {
                   {event.schedules && event.schedules.map((schedule) => {
                     return (
                         <>
-                            {schedule.days.map((day) => (
+                        {
+                            schedule.days.length == 7 && (
+                                <span key={"everyday"} className="inline-block px-2 py-1 mr-1 bg-gray-200 text-gray-700 rounded-full text-xs">
+                                    Everyday
+                                </span>
+                            )
+                        }
+                            {schedule.days.length < 7 && schedule.days.map((day) => (
                                 <span key={day} className="inline-block px-2 py-1 mr-1 bg-gray-200 text-gray-700 rounded-full text-xs">
                                     {day}
                                 </span>

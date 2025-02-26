@@ -17,6 +17,8 @@ export default function FeaturedEvent({ event }: { event: Event }) {
               </div>
               <div className="p-6">
                   <DateHeader {...event} />
+
+ 
                   
                 <h3 className="text-xl font-semibold mb-2 text-black">{event.title}</h3>
                 <p className="text-gray-600 mb-4">{event.venue}</p>

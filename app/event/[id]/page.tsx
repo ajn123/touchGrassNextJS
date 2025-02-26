@@ -31,6 +31,13 @@ export default async function EventPage({ params }: { params: paramsType } ) {
                     <SocialMediaIcon {...event} />
                 </div>
                 <DateHeader {...event} />
+                {
+                    event.schedules && event.schedules.map((schedule) => (
+                      <div key={schedule.time}>
+                        <p className="text-gray-600 my-4 underline">{schedule.time} on {schedule.days.join(", ")}</p>
+                      </div>
+                    ))
+                  }
                 <div className="prose max-w-none text-black">
                     {event.description}
                 </div>
