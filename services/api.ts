@@ -1,5 +1,5 @@
 const API_URL =  "https://touchgrassdc-production.up.railway.app";
-const INTERNAL_API_URL = process.env.INTERNAL_API_URL;
+const INTERNAL_API_URL = API_URL;
 
 import { Event } from '@/types/event';
 

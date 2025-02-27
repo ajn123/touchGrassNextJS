@@ -33,7 +33,7 @@ export default async function EventPage({ params }: { params: paramsType } ) {
                 <DateHeader {...event} />
                 {
                     event.schedules && event.schedules.map((schedule) => (
-                      <div key={schedule.time}>
+                      <div key={schedule.time + schedule.days.join(", ")}>
                         <p className="text-gray-600 my-4 underline">{schedule.time} on {schedule.days.join(", ")}</p>
                       </div>
                     ))
