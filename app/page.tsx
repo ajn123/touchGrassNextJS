@@ -15,6 +15,7 @@ export default async function Home() {
           src={"/dc-skyline.jpg"}
           alt="DC Events Hero"
           fill
+          sizes="100vw"
           className="object-cover"
           priority
         />

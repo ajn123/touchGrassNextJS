@@ -12,6 +12,7 @@ export default function FeaturedEvent({ event }: { event: Event }) {
                   src={event.image_url}
                   alt={event.title}
                   fill
+                  sizes="100vw"
                   className="object-cover"
                 />
               </div>
