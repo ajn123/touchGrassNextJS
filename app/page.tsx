@@ -1,11 +1,11 @@
 import Image from "next/image";
-import { getFeaturedEvents } from '../services/api';
+import { getFeaturedEvents, getCategories } from '../services/api';
 import FeaturedEvent from '../components/events/featuredEvent';
 import RecurringEvent from '../components/events/recurringEvent';
-
+import Link from 'next/link';
 export default async function Home() {
   const events = await getFeaturedEvents();
-
+  const categories = await getCategories();
   return (
     <main className="min-h-screen bg-background">
       {/* Hero Section */}
@@ -32,6 +32,7 @@ export default async function Home() {
         </div>
       </section>
 
+
       {/* Featured Events Section */}
       <section className="max-w-7xl mx-auto px-4 py-16">
         <h2 className="text-4xl font-bold mb-8">Featured Events</h2>
@@ -41,6 +42,22 @@ export default async function Home() {
           ))}
         </div>
       </section>
+
+      {/* Categories Section */}
+      <section className="max-w-7xl mx-auto px-4 py-16">
+        <h2 className="text-4xl font-bold mb-8">Browse by Category</h2>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {categories.map((category) => (
+            <div key={category} className="bg-white rounded-lg shadow-md p-6 text-center cursor-pointer hover:shadow-lg transition-shadow">
+              <Link href={`/category/${category}`}>
+                <h3 className="text-lg font-semibold text-gray-800">{category}</h3>
+              </Link>
+            </div>
+          ))}
+        </div>
+      </section>
+
+
       <RecurringEvent />
     </main>
   );

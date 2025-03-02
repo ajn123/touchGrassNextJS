@@ -55,6 +55,37 @@ export const getFeaturedEvents = async (): Promise<Event[]> => {
   }
 };
 
+
+export const getCategories = async (): Promise<string[]> => {
+  try {
+    const url = typeof window === 'undefined' ? INTERNAL_API_URL : API_URL;
+    console.log('Fetching from:', `${url}/api/events/categories`);
+    const response = await fetch(`${url}/api/events/categories`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch categories');
+    }
+    return response.json();
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    return [];
+  }
+};
+
+export const getCategory = async (category_id: string): Promise<Event[]> => {
+  try {
+    const url = typeof window === 'undefined' ? INTERNAL_API_URL : API_URL;
+    console.log('Fetching from:', `${url}/api/events/category/${category_id}`);
+    const response = await fetch(`${url}/api/events/category/${category_id}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch category');
+    }
+    return response.json();
+  } catch (error) {
+    console.error('Error fetching category:', error);
+    return [];
+  }
+};
+
 export const getRecurringEvents = async (): Promise<Event[]> => {
   try {
     const url = typeof window === 'undefined' ? INTERNAL_API_URL : API_URL;
