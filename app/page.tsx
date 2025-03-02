@@ -48,7 +48,7 @@ export default async function Home() {
         <h2 className="text-4xl font-bold mb-8">Browse by Category</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {categories.map((category) => (
-            <Link href={`/category/${category}`} className="hover:scale-105 transition-all duration-300">
+            <Link key={category} href={`/category/${category}`} className="hover:scale-105 transition-all duration-300">
               <div key={category} className="bg-white rounded-lg shadow-md p-6 text-center cursor-pointer hover:shadow-lg transition-shadow">
                   <h3 className="text-lg font-semibold text-gray-800">{category}</h3>
               </div>
