@@ -1,8 +1,10 @@
-const API_URL =  "https://touchgrassdc-production.up.railway.app";
+
+//const API_URL =  "http://eventsdc-backend:8000";
+const API_URL = "https://touchgrassdc-production.up.railway.app";
 const INTERNAL_API_URL = API_URL;
 
 import { Event } from '@/types/event';
-
+import { DatingProfile, Match } from '@/types/datingProfile';
 export const getEvent = async (event_id: string): Promise<Event | null> => {
   try {
     const url = typeof window === 'undefined' ? INTERNAL_API_URL : API_URL;
@@ -114,3 +116,25 @@ export const createEvent = async (event: Omit<Event, '_id'>): Promise<Event> => 
   }
   return response.json();
 }; 
+
+export const createDatingProfile = async (dating_profile: Omit<DatingProfile, '_id'>): Promise<DatingProfile> => {
+  const response = await fetch(`${API_URL}/api/dating`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(dating_profile),
+  });
+  if (!response.ok) {
+    throw new Error('Failed to create dating profile');
+  }
+  return response.json();
+};
+
+export const getMatchProfiles = async (): Promise<Match[]> => {
+  const response = await fetch(`${API_URL}/api/dating/matches`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch match profiles');
+  }
+  return response.json();
+};
