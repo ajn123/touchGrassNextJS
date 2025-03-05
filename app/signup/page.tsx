@@ -38,7 +38,7 @@ export default function SignupForm() {
                         </p>
                         <ul className="list-disc list-inside text-gray-600 text-left">
                             <li> We want to provide free match making for the DMV area</li>
-                            <li> There will be no swiping only dating prospects and if you are interested you can message them</li>
+                            <li> There will be no swiping only dating prospects and if you both are interested you can message them or we can arrange a date.</li>
                             <li> We will match you with people based on your interests and preferences</li>
                             <li> We will not share your information with anyone</li>
                             <li> We will always be free and never ask for your credit card information</li>
