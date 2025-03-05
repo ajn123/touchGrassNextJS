@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { getMatchProfiles, getUnmatchedProfiles } from '@/services/api';
+import { getMatchProfiles } from '@/services/api';
 import { DatingProfile } from '@/types/datingProfile';
 
 export interface Match {
@@ -11,23 +11,20 @@ export interface Match {
 export default function MatchingPage() {
     const [profiles, setProfiles] = useState<Match[]>([]);
     const [startIndex, setStartIndex] = useState<number>(0);
-    const [unmatchedProfiles, setUnmatchedProfiles] = useState<DatingProfile[]>([]);
+
+    const fetchProfiles = async () => {
+        try {
+            const matchProfiles = await getMatchProfiles();
+            setProfiles(matchProfiles);
+
+            console.log(matchProfiles);
+        } catch (error) {
+            console.error('Error fetching profiles:', error);
+        }
+    };
 
     console.log(startIndex);
     useEffect(() => {
-        const fetchProfiles = async () => {
-            try {
-                const matchProfiles = await getMatchProfiles();
-                setProfiles(matchProfiles);
-
-                const unmatchedProfiles = await getUnmatchedProfiles();
-                setUnmatchedProfiles(unmatchedProfiles);
-                console.log(matchProfiles);
-            } catch (error) {
-                console.error('Error fetching profiles:', error);
-            }
-        };
-
         fetchProfiles();
     }, []);
 
@@ -46,6 +43,12 @@ export default function MatchingPage() {
                     className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
                 >
                     Show One Match
+                </button>
+                <button 
+                    onClick={() => fetchProfiles()}
+                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                >
+                    Randomize
                 </button>
             </div>
             <div className="text-center mb-4">
@@ -67,15 +70,6 @@ export default function MatchingPage() {
                                 <p className="mt-2 text-black">{match.profile2.description}</p>
                             </div>
                         </div>
-                    </div>
-                ))}
-            </div>
-            <h1 className="text-2xl mt-8 font-bold mb-6 text-white text-center">Unmatched Profiles</h1>
-            <div className="space-y-4">
-                {unmatchedProfiles.map((profile, index) => (
-                    <div key={index} className="bg-white p-6 rounded-lg shadow-md">
-                        <h2 className="text-xl font-semibold text-black">{profile.name}</h2>
-                        <p className="mt-2 text-black">{profile.description}</p>
                     </div>
                 ))}
             </div>
