@@ -9,7 +9,7 @@ export default function SignupForm() {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const signup: Signup = { name, email };
-        signupForDating(signup).then((response) => {
+        signupForDating(signup).then(() => {
             setName("");
             setEmail("");
             alert("Signup successful");
@@ -53,7 +53,7 @@ export default function SignupForm() {
                     Sign Up
                 </button>
                 <p className="mt-4 text-sm text-gray-600 text-center">
-                    We'll email you when our match making service is ready!
+                    We will email you when our match making service is ready!
                 </p>
             </form>
         </div>
