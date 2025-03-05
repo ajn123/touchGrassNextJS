@@ -14,9 +14,7 @@ const Dating = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
         try {
-
 
             if (!formData.age) {
                 alert('Please enter your age');
@@ -99,14 +97,14 @@ const Dating = () => {
                         />
                     </div>
 
-                    <div>
+                    <div className="mt-4 "> 
                         <label htmlFor="gender" className="block text-sm font-medium text-black">Your Gender</label>
                         <select 
                             id="gender" 
                             name="gender"
                             value={formData.gender}
                             onChange={handleChange}
-                            className="mt-1 block w-full rounded-md border-gray-800 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-black"
+                            className="mt-1 block w-full rounded-md border-indigo-500 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-black"
                         >
                             <option value="">Select gender</option>
                             <option value="male">Male</option>
@@ -115,7 +113,7 @@ const Dating = () => {
                         </select>
                     </div>
 
-                    <div>
+                    <div className="mt-4">
                         <label htmlFor="gender_interest" className="block text-sm font-medium text-black">Interested In</label>
                         <select 
                             id="gender_interest" 
@@ -131,7 +129,7 @@ const Dating = () => {
                             <option value="everyone">Everyone</option>
                         </select>
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-2 mt-8">
                         <p className="block text-sm font-medium text-black">Age Range YOU want to meet (can select multiple)</p>
                         <div className="space-y-1">
                             <div className="flex items-center">
@@ -209,7 +207,7 @@ const Dating = () => {
                         </div>
                     </div>
 
-                    <div>
+                    <div className="mt-8">
                         <label htmlFor="description" className="block text-sm font-medium text-black">Describe yourself so others can find you</label>
                         <textarea 
                             id="description" 

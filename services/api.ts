@@ -5,6 +5,8 @@ const INTERNAL_API_URL = API_URL;
 
 import { Event } from '@/types/event';
 import { DatingProfile, Match } from '@/types/datingProfile';
+import { Signup } from '@/types/signup';
+
 export const getEvent = async (event_id: string): Promise<Event | null> => {
   try {
     const url = typeof window === 'undefined' ? INTERNAL_API_URL : API_URL;
@@ -136,5 +138,25 @@ export const getMatchProfiles = async (): Promise<Match[]> => {
   if (!response.ok) {
     throw new Error('Failed to fetch match profiles');
   }
+  return response.json();
+};
+
+
+export const getUnmatchedProfiles = async (): Promise<DatingProfile[]> => {
+  const response = await fetch(`${API_URL}/api/dating/unmatched`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch unmatched profiles');
+  }
+  return response.json();
+};
+
+export const signupForDating = async (signup: Signup): Promise<Signup> => {
+  const response = await fetch(`${API_URL}/api/dating/signup`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(signup),
+  });
   return response.json();
 };

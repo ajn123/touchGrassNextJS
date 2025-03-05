@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { getMatchProfiles } from '@/services/api';
+import { getMatchProfiles, getUnmatchedProfiles } from '@/services/api';
 import { DatingProfile } from '@/types/datingProfile';
 
 export interface Match {
@@ -11,7 +11,7 @@ export interface Match {
 export default function MatchingPage() {
     const [profiles, setProfiles] = useState<Match[]>([]);
     const [startIndex, setStartIndex] = useState<number>(0);
-
+    const [unmatchedProfiles, setUnmatchedProfiles] = useState<DatingProfile[]>([]);
 
     console.log(startIndex);
     useEffect(() => {
@@ -19,6 +19,9 @@ export default function MatchingPage() {
             try {
                 const matchProfiles = await getMatchProfiles();
                 setProfiles(matchProfiles);
+
+                const unmatchedProfiles = await getUnmatchedProfiles();
+                setUnmatchedProfiles(unmatchedProfiles);
                 console.log(matchProfiles);
             } catch (error) {
                 console.error('Error fetching profiles:', error);
@@ -64,6 +67,15 @@ export default function MatchingPage() {
                                 <p className="mt-2 text-black">{match.profile2.description}</p>
                             </div>
                         </div>
+                    </div>
+                ))}
+            </div>
+            <h1 className="text-2xl mt-8 font-bold mb-6 text-white text-center">Unmatched Profiles</h1>
+            <div className="space-y-4">
+                {unmatchedProfiles.map((profile, index) => (
+                    <div key={index} className="bg-white p-6 rounded-lg shadow-md">
+                        <h2 className="text-xl font-semibold text-black">{profile.name}</h2>
+                        <p className="mt-2 text-black">{profile.description}</p>
                     </div>
                 ))}
             </div>
