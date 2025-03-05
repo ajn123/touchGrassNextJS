@@ -33,6 +33,16 @@ export default function SignupForm() {
                         className="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md"
                     >
                         <h2 className="text-2xl font-bold mb-6 text-black text-center">Sign Up for Match Making</h2>
+                        <p className="text-gray-600 text-center font-bold">
+                            We will email you when our match making service is ready!
+                        </p>
+                        <ul className="list-disc list-inside text-gray-600 text-left">
+                            <li> We want to provide free match making for the DMV area</li>
+                            <li> There will be no swiping only dating prospects and if you are interested you can message them</li>
+                            <li> We will match you with people based on your interests and preferences</li>
+                            <li> We will not share your information with anyone</li>
+                            <li> We will always be free and never ask for your credit card information</li>
+                        </ul>
                         <div className="mb-4">
                             <label htmlFor="name" className="block text-gray-700 font-medium mb-2">Name</label>
                             <input
