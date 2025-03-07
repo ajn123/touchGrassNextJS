@@ -1,5 +1,5 @@
 export interface DatingProfile {
-    _id: string;
+    _id: string | null;
     name: string;
     gender: string;
     gender_interest: string;

@@ -87,6 +87,7 @@ export default function SignupForm() {
                         <h2 className="text-2xl font-bold text-black text-center">Congratulations!</h2>
                         <p className="mt-4 text-gray-600 text-center">
                             Thank you for signing up. We will be in touch soon!
+                            Follow us on <a href="https://www.instagram.com/touchgrassdc/" className="text-blue-500">Instagram</a> for updates.
                         </p>
                     </motion.div>
                 )}

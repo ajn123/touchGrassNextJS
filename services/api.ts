@@ -1,6 +1,6 @@
 
 //const API_URL =  "http://eventsdc-backend:8000";
-const API_URL = "https://touchgrassdc-production.up.railway.app";
+let API_URL = process.env.NEXT_PUBLIC_ENVIRONMENT === 'dev' ? "http://localhost:8000" : "https://touchgrassdc-production.up.railway.app";
 const INTERNAL_API_URL = API_URL;
 
 import { Event } from '@/types/event';
@@ -119,7 +119,10 @@ export const createEvent = async (event: Omit<Event, '_id'>): Promise<Event> => 
   return response.json();
 }; 
 
-export const createDatingProfile = async (dating_profile: Omit<DatingProfile, '_id'>): Promise<DatingProfile> => {
+export const createDatingProfile = async (dating_profile: DatingProfile): Promise<DatingProfile> => {
+    API_URL = "http://localhost:8000";
+    console.log('API URL:', API_URL);
+    console.log('Creating dating profile:', JSON.stringify(dating_profile));
   const response = await fetch(`${API_URL}/api/dating`, {
     method: 'POST',
     headers: {

@@ -1,10 +1,14 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createDatingProfile } from '@/services/api';
 import { motion } from 'framer-motion';
 
 const Dating = () => {
+
+    const [isLoading, setIsLoading] = useState(true);
+
     const [formData, setFormData] = useState({
+        _id: '',
         name: '',
         age: '',
         gender: '',
@@ -12,6 +16,38 @@ const Dating = () => {
         age_range: [] as string[],
         description: ''
     });
+
+    const loadProfile = () => {
+        if (typeof window !== 'undefined') {
+            const profileCookie = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('profileId='));
+
+            if (profileCookie) {
+                // Get stored profile data from localStorage
+                const storedProfile = localStorage.getItem('datingProfile');
+                if (storedProfile) {
+                    const profileData = JSON.parse(storedProfile);
+                    setFormData({
+                        _id: profileData._id,
+                        name: profileData.name || '',
+                        age: profileData.age?.toString() || '',
+                        gender: profileData.gender || '',
+                        gender_interest: profileData.gender_interest || '',
+                        age_range: profileData.age_range || [],
+                        description: profileData.description || ''
+                    });
+                }
+            }
+        }
+    }
+
+    // Check for existing profile data when component mounts
+    useEffect(() => {
+        loadProfile();
+        setIsLoading(false);
+
+    }, []);
 
     const [isFlipped, setIsFlipped] = useState(false);
 
@@ -23,6 +59,7 @@ const Dating = () => {
                 return;
             }
             const response = await createDatingProfile({
+                '_id': formData._id,
                 name: formData.name,
                 age: parseInt(formData.age),
                 gender: formData.gender,
@@ -30,23 +67,22 @@ const Dating = () => {
                 age_range: formData.age_range,
                 description: formData.description
             });
+            console.log(`response: ${JSON.stringify(response)}`);
             if (!response) {
                 throw new Error('Failed to submit form');
             }
-
+            else {
+            // Store profile data in localStorage
+            localStorage.setItem('datingProfile', JSON.stringify(response));
+            // Set a cookie with basic profile info
+            document.cookie = `profileId=${response._id}; path=/; max-age=2592000`; // 30 days expiry
+            loadProfile();
+            }
             // Flip the card
             setIsFlipped(true);
 
             // Reset form after delay
             setTimeout(() => {
-                setFormData({
-                    name: '',
-                    age: '',
-                    gender: '',
-                    gender_interest: '',
-                    age_range: [],
-                    description: ''
-                });
                 setIsFlipped(false);
             }, 4000);
 
@@ -243,7 +279,7 @@ const Dating = () => {
                 ) : (
                     <div className="bg-indigo-600 rounded-lg shadow-md p-8 text-center" style={{ transform: 'rotateY(180deg)' }}>
                         <h2 className="text-3xl font-bold text-white mb-4">Congratulations!</h2>
-                        <p className="text-white text-lg">Your profile has been submitted successfully.</p>
+                        <p className="text-white text-lg">Your profile has been submitted successfully.  You can resubmit with different information if you want to.</p>
                     </div>
                 )}
             </motion.div>
