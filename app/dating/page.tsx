@@ -5,8 +5,6 @@ import { motion } from 'framer-motion';
 
 const Dating = () => {
 
-    const [isLoading, setIsLoading] = useState(true);
-
     const [formData, setFormData] = useState({
         _id: '',
         name: '',
@@ -45,7 +43,6 @@ const Dating = () => {
     // Check for existing profile data when component mounts
     useEffect(() => {
         loadProfile();
-        setIsLoading(false);
 
     }, []);
 
