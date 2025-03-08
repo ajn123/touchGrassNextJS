@@ -120,9 +120,6 @@ export const createEvent = async (event: Omit<Event, '_id'>): Promise<Event> => 
 }; 
 
 export const createDatingProfile = async (dating_profile: DatingProfile): Promise<DatingProfile> => {
-    API_URL = "http://localhost:8000";
-    console.log('API URL:', API_URL);
-    console.log('Creating dating profile:', JSON.stringify(dating_profile));
   const response = await fetch(`${API_URL}/api/dating`, {
     method: 'POST',
     headers: {
