@@ -6,6 +6,7 @@ const INTERNAL_API_URL = API_URL;
 import { Event } from '@/types/event';
 import { DatingProfile, Match } from '@/types/datingProfile';
 import { Signup } from '@/types/signup';
+import { Question } from '@/types/question';
 
 export const getEvent = async (event_id: string): Promise<Event | null> => {
   try {
@@ -120,6 +121,8 @@ export const createEvent = async (event: Omit<Event, '_id'>): Promise<Event> => 
 }; 
 
 export const createDatingProfile = async (dating_profile: DatingProfile): Promise<DatingProfile> => {
+    console.log('Creating dating profile:', process.env.NEXT_PUBLIC_ENVIRONMENT);
+    console.log('Creating dating profile:', API_URL);
   const response = await fetch(`${API_URL}/api/dating`, {
     method: 'POST',
     headers: {
@@ -158,5 +161,13 @@ export const signupForDating = async (signup: Signup): Promise<Signup> => {
     },
     body: JSON.stringify(signup),
   });
+  return response.json();
+};
+
+export const getQuestions = async (): Promise<Question[]> => {
+  const response = await fetch(`${API_URL}/api/questions`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch questions');
+  }
   return response.json();
 };

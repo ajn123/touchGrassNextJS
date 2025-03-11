@@ -1,13 +1,27 @@
 'use client'
-import { useState } from "react";   
+import { useEffect, useState } from "react";   
 import { Signup } from "@/types/signup";
-import { signupForDating } from "@/services/api";
-import { motion, AnimatePresence } from "framer-motion";
+import { getQuestions, signupForDating } from "@/services/api";
+import { Question } from "@/types/question";
+import { AnimatePresence } from "framer-motion";
+import QuestionAnswer from "@/components/questions/questionAnswer";
+import { motion } from "framer-motion";
 
 export default function SignupForm() {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [isSubmitted, setIsSubmitted] = useState(false);
+
+    const [questions, setQuestions] = useState<Question[]>([]);
+
+    const initializeQuestions = async () => {
+        setQuestions(await getQuestions());
+    }
+
+
+    useEffect(() => {
+        initializeQuestions();
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -92,6 +106,12 @@ export default function SignupForm() {
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            <div className="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
+                {questions.map((question) => (
+                    <QuestionAnswer key={question.title} question={question} />
+                ))}
+            </div>
         </div>
     );
 }
