@@ -1,13 +1,13 @@
-
 //const API_URL =  "http://eventsdc-backend:8000";
-let API_URL = process.env.NEXT_PUBLIC_ENVIRONMENT === 'dev' ? "http://localhost:8000" : "https://touchgrassdc-production.up.railway.app";
-const INTERNAL_API_URL = API_URL;
+const INTERNAL_API_URL = process.env.API_URL;
+const API_URL = process.env.API_URL;
 
 import { Event } from '@/types/event';
 import { DatingProfile, Match } from '@/types/datingProfile';
 import { Signup } from '@/types/signup';
 import { Question } from '@/types/question';
-
+import { getSession } from 'next-auth/react';
+import { UserAnswer } from '@/types/userAnswer';
 export const getEvent = async (event_id: string): Promise<Event | null> => {
   try {
     const url = typeof window === 'undefined' ? INTERNAL_API_URL : API_URL;
@@ -170,4 +170,35 @@ export const getQuestions = async (): Promise<Question[]> => {
     throw new Error('Failed to fetch questions');
   }
   return response.json();
+};
+
+
+
+export const submitAnswers = async (questions: Question[]): Promise<Question[]> => {
+  const session = await getSession();
+  const url = typeof window === 'undefined' ? INTERNAL_API_URL : API_URL;
+
+  if (!session?.user?.accessToken) {
+    throw new Error('No authentication token found');
+  }
+  else {
+    console.log("Session found:", session);
+  }
+
+  const response = await fetch(`http://localhost:8000/api/questions/submit`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${session?.user?.accessToken}`,
+    },
+    credentials: 'include',
+    body: JSON.stringify(questions),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to submit answers');
+  }
+
+  const data = await response.json();
+  return data;
 };

@@ -55,7 +55,7 @@ export default function SignUpForm() {
 
     try {
       // First, create the account
-      const signupResponse = await fetch('http://localhost:8000/api/auth/signup', {
+      const signupResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
