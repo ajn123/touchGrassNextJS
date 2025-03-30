@@ -7,10 +7,6 @@ import QuestionAnswer from './questionAnswer';
 import { submitAnswers } from '@/services/api';
 import { Question } from '@/types/question';
 
-interface QuestionFormProps {
-  questions: Question[];
-}
-
 export default function QuestionForm() {
   const { data: session } = useSession();
   const [currentQuestions, setCurrentQuestions] = useState<Question[]>([]);
@@ -21,7 +17,7 @@ export default function QuestionForm() {
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/questions/user`, {
+        const response = await fetch(`${process.env.API_URL}/api/questions/user`, {
           credentials: 'include',
           headers: {
             'Authorization': `Bearer ${session?.user?.accessToken}`
@@ -100,8 +96,6 @@ export default function QuestionForm() {
   if (currentQuestions.length === 0) {
     return <div>Loading questions...</div>;
   }
-
-  const currentQuestion = currentQuestions[currentQuestionIndex];
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">

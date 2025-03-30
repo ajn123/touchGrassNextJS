@@ -1,7 +1,7 @@
 import { getEvent } from "@/services/api";
 import SocialMediaIcon from "@/components/buttons/socialMedia/socialMediaIcon";
 import DateHeader from "@/components/dates/dateHeader";
-
+import Image from "next/image";
 export type paramsType = Promise<{ id: string }>;
 export default async function EventPage({ params }: { params: paramsType } ) {
     const event = await getEvent((await params).id);
@@ -14,9 +14,10 @@ export default async function EventPage({ params }: { params: paramsType } ) {
     <section className="flex flex-col items-center justify-center min-h-screen p-4 md:p-8">
         <div className="w-full max-w-4xl bg-white rounded-lg shadow-lg overflow-hidden">
             <div className="relative w-full h-64 md:h-96">
-                <img 
-                    src={event.image_url} 
+                <Image
+                    src={event.image_url}
                     alt={event.title}
+                    sizes="10vw"
                     className="w-full h-full object-cover"
                 />
             </div>

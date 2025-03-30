@@ -1,3 +1,6 @@
+'use client';
+
+import { Suspense } from 'react';
 import LoginForm from "@/components/auth/LoginForm";
 
 export default function LoginPage() {
@@ -5,7 +8,9 @@ export default function LoginPage() {
         <div>
             <div className="flex flex-col items-center justify-center h-screen">
                 <h1 className="text-2xl font-bold">Login</h1>
-                <LoginForm />
+                <Suspense fallback={<div>Loading...</div>}>
+                    <LoginForm />
+                </Suspense>
             </div>
         </div>
     )

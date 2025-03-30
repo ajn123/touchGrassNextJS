@@ -1,6 +1,5 @@
 import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { JWT } from 'next-auth/jwt';
 
 // Extend the built-in types
 declare module 'next-auth' {
@@ -44,7 +43,7 @@ const handler = NextAuth({
           formData.append('username', credentials?.email || ''); // FastAPI expects 'username'
           formData.append('password', credentials?.password || '');
 
-          const response = await fetch('http://localhost:8000/api/auth/login', {
+          const response = await fetch(`${process.env.API_URL}/api/auth/login`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/x-www-form-urlencoded',

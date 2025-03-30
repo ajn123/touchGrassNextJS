@@ -31,6 +31,7 @@ export async function POST(request: Request) {
       data = JSON.parse(responseText);
     } catch (parseError) {
       console.error('Failed to parse response:', responseText);
+      console.log(parseError);
       return NextResponse.json(
         { error: `Server response: ${responseText}` },
         { status: 500 }

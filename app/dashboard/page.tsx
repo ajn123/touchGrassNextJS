@@ -1,11 +1,7 @@
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
-import QuestionAnswer from '@/components/questions/questionAnswer';
 import QuestionForm from '@/components/questions/questionForm';
-import { getSession } from 'next-auth/react';
 
 export default async function DashboardPage() {
-  // The questions will be fetched inside the QuestionForm component
-  const questions = [];
 
   return (
     <ProtectedRoute>

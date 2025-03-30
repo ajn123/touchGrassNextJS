@@ -185,7 +185,7 @@ export const submitAnswers = async (questions: Question[]): Promise<Question[]> 
     console.log("Session found:", session);
   }
 
-  const response = await fetch(`http://localhost:8000/api/questions/submit`, {
+  const response = await fetch(`${process.env.API_URL}/api/questions/submit`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
