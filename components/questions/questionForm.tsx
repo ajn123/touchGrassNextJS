@@ -17,7 +17,8 @@ export default function QuestionForm() {
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        const response = await fetch(`${process.env.API_URL}/api/questions/user`, {
+        // for client side you need NEXT_PUBLIC_API_URL 
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/questions/user`, {
           credentials: 'include',
           headers: {
             'Authorization': `Bearer ${session?.user?.accessToken}`

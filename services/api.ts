@@ -7,7 +7,7 @@ import { DatingProfile, Match } from '@/types/datingProfile';
 import { Signup } from '@/types/signup';
 import { Question } from '@/types/question';
 import { getSession } from 'next-auth/react';
-import { UserAnswer } from '@/types/userAnswer';
+
 export const getEvent = async (event_id: string): Promise<Event | null> => {
   try {
     const url = typeof window === 'undefined' ? INTERNAL_API_URL : API_URL;
