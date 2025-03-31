@@ -54,6 +54,7 @@ export default function SignUpForm() {
     }
 
     try {
+      console.log("hihi");;
       // First, create the account
       const signupResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/signup`, {
         method: 'POST',

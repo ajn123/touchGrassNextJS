@@ -2,9 +2,26 @@
 
 import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
+import { toast } from 'react-hot-toast';
 
 export default function Navbar() {
   const { data: session, status } = useSession();
+
+  const handleSignOut = async () => {
+    try {
+      await signOut({ 
+        redirect: true, 
+        callbackUrl: '/' 
+      }).then(() => {
+        setTimeout(() => {
+          toast.success('Signed out successfully');
+        }, 2000);
+      });
+    } catch (error) {
+      toast.error('Failed to sign out');
+      console.error('Sign out error:', error);
+    }
+  };
 
   return (
     <nav className="bg-white shadow-lg">
@@ -29,7 +46,7 @@ export default function Navbar() {
                   Dashboard
                 </Link>
                 <button
-                  onClick={() => signOut()}
+                  onClick={handleSignOut}
                   className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
                 >
                   Sign Out

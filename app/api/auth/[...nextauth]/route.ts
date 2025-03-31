@@ -36,34 +36,28 @@ const handler = NextAuth({
       },
       async authorize(credentials) {
         try {
-          // Log the credentials being sent (remove in production)
-          console.log('Auth attempt for:', credentials?.email);
+          if (!credentials?.email || !credentials?.password) {
+            throw new Error('Email and password are required');
+          }
 
-          const formData = new URLSearchParams();
-          formData.append('username', credentials?.email || ''); // FastAPI expects 'username'
-          formData.append('password', credentials?.password || '');
-
-          const response = await fetch(`${process.env.API_URL}/api/auth/login`, {
+          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/x-www-form-urlencoded',
-              'Accept': 'application/json',
             },
-            body: formData,
+            body: new URLSearchParams({
+              username: credentials.email,
+              password: credentials.password,
+            }),
           });
 
-          const data = await response.json();
-          console.log('Auth response:', {
-            status: response.status,
-            data: data
-          });
+          const data = await res.json();
 
-          if (!response.ok) {
+          if (!res.ok) {
             console.error('Auth failed:', data);
             throw new Error(data.detail || 'Authentication failed');
           }
 
-          // Return the user object in the expected format
           return {
             id: data.user.email,
             email: data.user.email,
@@ -72,7 +66,7 @@ const handler = NextAuth({
           };
         } catch (error) {
           console.error('Auth error:', error);
-          return null;
+          throw new Error('Invalid credentials');
         }
       }
     })
@@ -101,7 +95,15 @@ const handler = NextAuth({
         session.user.name = token.name as string;
       }
       return session;
-    }
+    },
+    async signIn() {
+      const isAllowedToSignIn = true;
+      if (isAllowedToSignIn) {
+        return true;
+      } else {
+        return false;
+      }
+    },
   },
   debug: true, // Enable debug messages
 });

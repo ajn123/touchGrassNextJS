@@ -2,7 +2,8 @@
 
 import { signIn } from 'next-auth/react';
 import { useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+import { toast } from 'react-hot-toast';
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
@@ -10,29 +11,33 @@ export default function LoginForm() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const searchParams = useSearchParams();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError('');
     setLoading(true);
+    const loadingToast = toast.loading('Signing in...');
 
     try {
       const result = await signIn('credentials', {
-        email,
-        password,
+        email: email,
+        password: password,
         redirect: false,
+        callbackUrl: 'http://localhost:8000'
       });
 
       if (result?.error) {
+        toast.dismiss(loadingToast);
+        toast.error('Invalid email or password');
         setError('Invalid email or password');
       } else {
-        // Check if there's a callback URL
-        const callbackUrl = searchParams.get('callbackUrl');
-        router.push(callbackUrl || '/');
+        toast.dismiss(loadingToast);
+        toast.success('Signed in successfully!');
+        router.push('/');
         router.refresh();
       }
     } catch (error) {
+      toast.dismiss(loadingToast);
+      toast.error('An error occurred during sign in');
       setError('An error occurred during sign in');
       console.error('Sign in error:', error);
     } finally {

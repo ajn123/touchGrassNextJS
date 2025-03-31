@@ -7,6 +7,7 @@ import { DatingProfile, Match } from '@/types/datingProfile';
 import { Signup } from '@/types/signup';
 import { Question } from '@/types/question';
 import { getSession } from 'next-auth/react';
+import toast from 'react-hot-toast';
 
 export const getEvent = async (event_id: string): Promise<Event | null> => {
   try {
@@ -185,7 +186,7 @@ export const submitAnswers = async (questions: Question[]): Promise<Question[]> 
     console.log("Session found:", session);
   }
 
-  const response = await fetch(`${process.env.API_URL}/api/questions/submit`, {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/questions/submit`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

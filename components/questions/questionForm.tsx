@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import QuestionAnswer from './questionAnswer';
 import { submitAnswers } from '@/services/api';
 import { Question } from '@/types/question';
+import { toast } from 'react-hot-toast';
 
 export default function QuestionForm() {
   const { data: session } = useSession();
@@ -54,22 +55,27 @@ export default function QuestionForm() {
     e.preventDefault();
     
     try {
-      console.log("Submitting answers:", questions);
       const result = await submitAnswers(questions);
+      console.log("Result:", result);
+      toast.success('Your answers have been submitted successfully!');
       
-      if (!result) {
-        throw new Error('Failed to submit answers');
-      }
-
-      console.log('Answers submitted successfully');
     } catch (error) {
+      toast.error('Failed to submit answers. Please try again.');
       console.error('Error submitting answers:', error);
     }
   };
 
   const handleNext = () => {
-    setDirection(1);
-    setCurrentQuestionIndex(prev => Math.min(prev + 1, currentQuestions.length - 1));
+    const currentQuestion = questions[currentQuestionIndex];
+    if (currentQuestion.required && !currentQuestion.answer) {
+      toast.error('Please answer this question before continuing');
+      return;
+    }
+    
+    if (currentQuestionIndex < questions.length - 1) {
+      setDirection(1);
+      setCurrentQuestionIndex(prev => prev + 1);
+    }
   };
 
   const handlePrevious = () => {
