@@ -18,6 +18,8 @@ export default async function EventPage({ params }: { params: paramsType } ) {
                     src={event.image_url}
                     alt={event.title}
                     sizes="10vw"
+                    width={1000}
+                    height={1000}
                     className="w-full h-full object-cover"
                 />
             </div>

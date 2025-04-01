@@ -22,7 +22,7 @@ export default function LoginForm() {
         email: email,
         password: password,
         redirect: false,
-        callbackUrl: 'http://localhost:8000'
+        callbackUrl: process.env.NEXT_PUBLIC_API_URL
       });
 
       if (result?.error) {
