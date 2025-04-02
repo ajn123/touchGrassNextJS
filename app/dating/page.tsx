@@ -1,287 +1,101 @@
 'use client';
-import { useEffect, useState } from 'react';
-import { createDatingProfile } from '@/services/api';
-import { motion } from 'framer-motion';
 
-const Dating = () => {
+import { useState } from 'react';
 
-    const [formData, setFormData] = useState({
-        _id: '',
-        name: '',
-        age: '',
-        gender: '',
-        gender_interest: '',
-        age_range: [] as string[],
-        description: ''
-    });
-
-    const loadProfile = () => {
-        if (typeof window !== 'undefined') {
-            const profileCookie = document.cookie
-            .split('; ')
-            .find(row => row.startsWith('profileId='));
-
-            if (profileCookie) {
-                // Get stored profile data from localStorage
-                const storedProfile = localStorage.getItem('datingProfile');
-                if (storedProfile) {
-                    const profileData = JSON.parse(storedProfile);
-                    setFormData({
-                        _id: profileData._id,
-                        name: profileData.name || '',
-                        age: profileData.age?.toString() || '',
-                        gender: profileData.gender || '',
-                        gender_interest: profileData.gender_interest || '',
-                        age_range: profileData.age_range || [],
-                        description: profileData.description || ''
-                    });
-                }
-            }
-        }
-    }
-
-    // Check for existing profile data when component mounts
-    useEffect(() => {
-        loadProfile();
-
-    }, []);
-
-    const [isFlipped, setIsFlipped] = useState(false);
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        try {
-            if (!formData.age) {
-                alert('Please enter your age');
-                return;
-            }
-            const response = await createDatingProfile({
-                '_id': formData._id,
-                name: formData.name,
-                age: parseInt(formData.age),
-                gender: formData.gender,
-                gender_interest: formData.gender_interest,
-                age_range: formData.age_range,
-                description: formData.description
-            });
-            console.log(`response: ${JSON.stringify(response)}`);
-            if (!response) {
-                throw new Error('Failed to submit form');
-            }
-            else {
-            // Store profile data in localStorage
-            localStorage.setItem('datingProfile', JSON.stringify(response));
-            // Set a cookie with basic profile info
-            document.cookie = `profileId=${response._id}; path=/; max-age=2592000`; // 30 days expiry
-            loadProfile();
-            }
-            // Flip the card
-            setIsFlipped(true);
-
-            // Reset form after delay
-            setTimeout(() => {
-                setIsFlipped(false);
-            }, 4000);
-
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Failed to submit profile. Please try again.');
-        }
-    };
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
-    };
-
-    const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { value, checked } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            age_range: checked 
-                ? [...prev.age_range, value]
-                : prev.age_range.filter(range => range !== value)
-        }));
-    };
-
-    return (
-        <div className="max-w-lg mx-auto mt-8 p-6 bg-gray-100">
-            <motion.div 
-                animate={{ rotateY: isFlipped ? 180 : 0 }}
-                transition={{ duration: 0.6 }}
-                style={{ transformStyle: 'preserve-3d' }}
-            >
-                {!isFlipped ? (
-                    <div className="bg-white rounded-lg shadow-md">
-                        <h1 className="text-2xl font-bold mb-6 text-black text-center">Speed Dating</h1>
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                            <div className="bg-white p-4 rounded-lg">
-                                <div>
-                                    <label htmlFor="name" className="block text-sm font-medium text-black">Your Name</label>
-                                    <input 
-                                        type="text" 
-                                        id="name" 
-                                        name="name"
-                                        value={formData.name}
-                                        onChange={handleChange}
-                                        className="mt-1 block w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500  bg-gray-200 text-black" 
-                                    />
-                                </div>
-                                <div>
-                                    <label htmlFor="age" className="block text-sm font-medium text-black">Your Age</label>
-                                    <input 
-                                        type="number" 
-                                        id="age" 
-                                        name="age" 
-                                        min="18" 
-                                        max="100"
-                                        value={formData.age}
-                                        onChange={handleChange}
-                                        className="mt-1 block w-full rounded-md border-gray-800 bg-black shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-200 text-black" 
-                                    />
-                                </div>
-
-                                <div className="mt-4 "> 
-                                    <label htmlFor="gender" className="block text-sm font-medium text-black">Your Gender</label>
-                                    <select 
-                                        id="gender" 
-                                        name="gender"
-                                        value={formData.gender}
-                                        onChange={handleChange}
-                                        className="mt-1 block w-full rounded-md border-indigo-500 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-black bg-gray-200"
-                                    >
-                                        <option value="">Select gender</option>
-                                        <option value="male">Male</option>
-                                        <option value="female">Female</option>
-                                        <option value="non-binary">Non-binary</option>
-                                    </select>
-                                </div>
-
-                                <div className="mt-4">
-                                    <label htmlFor="gender_interest" className="block text-sm font-medium text-black">Interested In</label>
-                                    <select 
-                                        id="gender_interest" 
-                                        name="gender_interest"
-                                        value={formData.gender_interest}
-                                        onChange={handleChange}
-                                        className="mt-1 block w-full rounded-md border-gray-300 bg-gray-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-black"
-                                    >
-                                        <option value="">Select gender interest</option>
-                                        <option value="male">Male</option>
-                                        <option value="female">Female</option>
-                                        <option value="non-binary">Non-binary</option>
-                                        <option value="everyone">Everyone</option>
-                                    </select>
-                                </div>
-                                <div className="space-y-2 mt-8">
-                                    <p className="block text-sm font-medium text-black">Age Range YOU want to meet (can select multiple)</p>
-                                    <div className="space-y-1">
-                                        <div className="flex items-center">
-                                            <input 
-                                                type="checkbox" 
-                                                id="age21-25" 
-                                                name="ageRange" 
-                                                value="21-25"
-                                                checked={formData.age_range.includes('21-25')}
-                                                onChange={handleCheckboxChange}
-                                                className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" 
-                                            />
-                                            <label htmlFor="age21-25" className="ml-2 text-sm text-black">21-25</label>
-                                        </div>
-                                        <div className="flex items-center">
-                                            <input 
-                                                type="checkbox" 
-                                                id="age26-30" 
-                                                name="ageRange" 
-                                                value="26-30"
-                                                checked={formData.age_range.includes('26-30')}
-                                                onChange={handleCheckboxChange}
-                                                className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" 
-                                            />
-                                            <label htmlFor="age26-30" className="ml-2 text-sm text-black">26-30</label>
-                                        </div>
-                                        <div className="flex items-center">
-                                            <input 
-                                                type="checkbox" 
-                                                id="age31-35" 
-                                                name="ageRange" 
-                                                value="31-35"
-                                                checked={formData.age_range.includes('31-35')}
-                                                onChange={handleCheckboxChange}
-                                                className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" 
-                                            />
-                                            <label htmlFor="age31-35" className="ml-2 text-sm text-black">31-35</label>
-                                        </div>
-                                        <div className="flex items-center">
-                                            <input 
-                                                type="checkbox" 
-                                                id="age36-40" 
-                                                name="ageRange" 
-                                                value="36-40"
-                                                checked={formData.age_range.includes('36-40')}
-                                                onChange={handleCheckboxChange}
-                                                className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" 
-                                            />
-                                            <label htmlFor="age36-40" className="ml-2 text-sm text-black">36-40</label>
-                                        </div>
-                                        <div className="flex items-center">
-                                            <input 
-                                                type="checkbox" 
-                                                id="age41-45" 
-                                                name="ageRange" 
-                                                value="41-45"
-                                                checked={formData.age_range.includes('41-45')}
-                                                onChange={handleCheckboxChange}
-                                                className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" 
-                                            />
-                                            <label htmlFor="age41-45" className="ml-2 text-sm text-black">41-45</label>
-                                        </div>
-                                        <div className="flex items-center">
-                                            <input 
-                                                type="checkbox" 
-                                                id="age46plus" 
-                                                name="ageRange" 
-                                                value="46+"
-                                                checked={formData.age_range.includes('46+')}
-                                                onChange={handleCheckboxChange}
-                                                className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" 
-                                            />
-                                            <label htmlFor="age46plus" className="ml-2 text-sm text-black">46+</label>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="mt-8">
-                                    <label htmlFor="description" className="block text-sm font-medium text-black">Describe yourself so others can find you</label>
-                                    <textarea 
-                                        id="description" 
-                                        name="description" 
-                                        rows={4}
-                                        value={formData.description}
-                                        onChange={handleChange}
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-black" 
-                                        placeholder="Describe your outfit..."
-                                    ></textarea>
-                                </div>
-                            </div>
-
-                            <button type="submit" className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                                Submit
-                            </button>
-                        </form>
-                    </div>
-                ) : (
-                    <div className="bg-indigo-600 rounded-lg shadow-md p-8 text-center" style={{ transform: 'rotateY(180deg)' }}>
-                        <h2 className="text-3xl font-bold text-white mb-4">Congratulations!</h2>
-                        <p className="text-white text-lg">Your profile has been submitted successfully.  You can resubmit with different information if you want to.</p>
-                    </div>
-                )}
-            </motion.div>
-        </div>
-    );
+interface FAQ {
+  question: string;
+  answer: string;
 }
 
-export default Dating;
+export default function DatingFAQPage() {
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+
+  const faqs: FAQ[] = [
+    {
+      question: "What is the DMV Dating Service?",
+      answer: "We're a free matchmaking service dedicated to helping singles in the DC, Maryland, and Virginia area find meaningful connections. Our service focuses on creating genuine matches based on compatibility, interests, and lifestyle."
+    },
+    {
+      question: "How does the matching process work?",
+      answer: "Our process involves completing a detailed questionnaire about your interests, values, and what you're looking for in a partner. We use this information to suggest compatible matches in the DMV area. Each match is carefully reviewed to ensure compatibility."
+    },
+    {
+      question: "Is this service really free?",
+      answer: "Yes! Our basic matchmaking service is completely free for DMV residents. We believe everyone deserves a chance to find meaningful connections without financial barriers."
+    },
+    {
+      question: "Who can join?",
+      answer: "Anyone 18 or older living in the DC, Maryland, or Virginia area can join. We welcome people of all backgrounds who are seriously looking for meaningful relationships."
+    },
+    {
+      question: "How do I get started?",
+      answer: "Simply create an account, complete our compatibility questionnaire, and upload a recent photo. Once your profile is verified, you'll start receiving carefully selected matches from the DMV area."
+    },
+    {
+      question: "How are matches made?",
+      answer: "We consider multiple factors including location within the DMV, shared interests, relationship goals, lifestyle compatibility, and personal preferences. Each match is reviewed before being suggested."
+    },
+    {
+      question: "What areas do you cover?",
+      answer: "We cover the entire DMV area including Washington DC, Northern Virginia (Alexandria, Arlington, Fairfax, etc.), and Maryland suburbs (Bethesda, Silver Spring, Rockville, etc.)."
+    },
+    {
+      question: "How is my privacy protected?",
+      answer: "Your privacy is our priority. Your personal information is never shared without your consent, and you control what information is visible to potential matches."
+    }
+  ];
+
+  return (
+    <div className="max-w-4xl mx-auto px-4 py-12">
+      <h1 className="text-4xl font-bold text-center mb-4">DMV Dating Service</h1>
+      <p className="text-center text-gray-600 mb-12">
+        Connecting hearts in the DC, Maryland, and Virginia area
+      </p>
+
+      <div className="space-y-4">
+        {faqs.map((faq, index) => (
+          <div
+            key={index}
+            className="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+          >
+            <button
+              onClick={() => setExpandedIndex(expandedIndex === index ? null : index)}
+              className={`w-full px-6 py-4 text-left flex justify-between items-center
+                ${expandedIndex === index 
+                  ? 'bg-rose-50 text-rose-700' 
+                  : 'bg-white text-gray-800 hover:bg-gray-50'
+                }
+                transition-colors duration-200`}
+            >
+              <span className="font-medium">{faq.question}</span>
+              <span className={`text-2xl ${
+                expandedIndex === index ? 'text-rose-500' : 'text-gray-400'
+              }`}>
+                {expandedIndex === index ? '−' : '+'}
+              </span>
+            </button>
+            {expandedIndex === index && (
+              <div className="px-6 py-4 bg-white border-t">
+                <p className="text-gray-700 leading-relaxed">
+                  {faq.answer}
+                </p>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-12 text-center">
+        <h2 className="text-2xl font-semibold mb-4">Ready to find your match?</h2>
+        <button
+          onClick={() => window.location.href = '/signup'}
+          className="bg-rose-500 text-white px-8 py-3 rounded-full 
+            hover:bg-rose-600 transition-colors
+            shadow-md hover:shadow-lg"
+        >
+          Get Started
+        </button>
+      </div>
+    </div>
+  );
+}

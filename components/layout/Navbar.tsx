@@ -3,9 +3,11 @@
 import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
 import { toast } from 'react-hot-toast';
+import { usePathname } from 'next/navigation';
 
 export default function Navbar() {
   const { data: session, status } = useSession();
+  const pathname = usePathname();
 
   const handleSignOut = async () => {
     try {
@@ -30,6 +32,31 @@ export default function Navbar() {
           <div className="flex">
             <Link href="/" className="flex items-center">
               <span className="text-xl font-bold text-black">DC Events</span>
+            </Link>
+            <Link
+              href="/"
+              className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                pathname === '/' 
+                  ? 'border-indigo-500 text-gray-900' 
+                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+              }`}
+            >
+              Home
+            </Link>
+            <Link
+              href="/dating"
+              className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ml-8 ${
+                pathname === '/dating'
+                  ? 'border-rose-500 text-gray-900'
+                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+              }`}
+            >
+              <span className="flex items-center">
+                Dating
+                <span className="ml-1 px-2 py-0.5 bg-rose-100 text-rose-600 text-xs rounded-full">
+                  Free
+                </span>
+              </span>
             </Link>
           </div>
 

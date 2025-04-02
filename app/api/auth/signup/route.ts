@@ -9,7 +9,7 @@ export async function POST(request: Request) {
       // password omitted for security
     });
 
-    const response = await fetch('https://touchgrassdc-production.up.railway.app/api/auth/signup', {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/signup`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
