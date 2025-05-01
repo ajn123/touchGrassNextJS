@@ -1,29 +1,26 @@
 'use client';
 
-import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
-import { toast } from 'react-hot-toast';
 import { usePathname } from 'next/navigation';
 
 export default function Navbar() {
-  const { data: session, status } = useSession();
   const pathname = usePathname();
 
-  const handleSignOut = async () => {
-    try {
-      await signOut({ 
-        redirect: true, 
-        callbackUrl: '/' 
-      }).then(() => {
-        setTimeout(() => {
-          toast.success('Signed out successfully');
-        }, 2000);
-      });
-    } catch (error) {
-      toast.error('Failed to sign out');
-      console.error('Sign out error:', error);
-    }
-  };
+  // const handleSignOut = async () => {
+  //   try {
+  //     await signOut({ 
+  //       redirect: true, 
+  //       callbackUrl: '/' 
+  //     }).then(() => {
+  //       setTimeout(() => {
+  //         toast.success('Signed out successfully');
+  //       }, 2000);
+  //     });
+  //   } catch (error) {
+  //     toast.error('Failed to sign out');
+  //     console.error('Sign out error:', error);
+  //   }
+  // };
 
   return (
     <nav className="bg-white shadow-lg">
@@ -60,7 +57,7 @@ export default function Navbar() {
             </Link>
           </div>
 
-          <div className="flex items-center space-x-4">
+          {/* <div className="flex items-center space-x-4">
             {status === 'loading' ? (
               <div>Loading...</div>
             ) : session ? (
@@ -95,7 +92,8 @@ export default function Navbar() {
                 </Link>
               </>
             )}
-          </div>
+          </div> */}
+
         </div>
       </div>
     </nav>

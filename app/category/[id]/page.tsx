@@ -7,14 +7,12 @@ export default async function CategoryPage({ params }: { params: paramsType }) {
     const category = await getCategory((await (params)).id);
 
     return  (
-      <section className="max-w-7xl mx-5 my-10 px-4 ">
-        <div>
+        <div className="columns-3 gap-4 my-10">
             {category.map((event: Event) => (                
-            <div key={event._id} className="my-4 border-4 border-gray-200 rounded-lg">
+            <div key={event._id} className="border-2 border-gray-200 rounded-lg">
                 <FeaturedEvent key={event._id} event={event} />
             </div>
             ))}
         </div>
-      </section>
     );
 }
