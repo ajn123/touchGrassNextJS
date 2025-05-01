@@ -40,7 +40,7 @@ export default function Navbar() {
             >
               Home
             </Link>
-            <Link
+            {/* <Link
               href="/dating"
               className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ml-8 ${
                 pathname === '/dating'
@@ -54,7 +54,7 @@ export default function Navbar() {
                   Free
                 </span>
               </span>
-            </Link>
+            </Link> */}
           </div>
 
           {/* <div className="flex items-center space-x-4">
