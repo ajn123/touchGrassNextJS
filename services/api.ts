@@ -179,18 +179,11 @@ export const submitAnswers = async (questions: Question[]): Promise<Question[]> 
   const session = await getSession();
   const url = typeof window === 'undefined' ? INTERNAL_API_URL : API_URL;
 
-  if (!session?.user?.accessToken) {
-    throw new Error('No authentication token found');
-  }
-  else {
-    console.log("Session found:", session);
-  }
 
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/questions/submit`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${session?.user?.accessToken}`,
     },
     credentials: 'include',
     body: JSON.stringify(questions),

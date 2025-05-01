@@ -16,31 +16,7 @@ export default function QuestionForm() {
   const [questions, setQuestions] = useState<Question[]>([]);
 
   useEffect(() => {
-    const fetchQuestions = async () => {
-      try {
-        // for client side you need NEXT_PUBLIC_API_URL 
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/questions/user`, {
-          credentials: 'include',
-          headers: {
-            'Authorization': `Bearer ${session?.user?.accessToken}`
-          }
-        });
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch questions');
-        }
-
-        const data = await response.json();
-        console.log("Fetched questions:", data);
-        setQuestions(data);
-      } catch (error) {
-        console.error('Error fetching questions:', error);
-      }
-    };
-
-    if (session?.user?.accessToken) {
-      fetchQuestions();
-    }
   }, [session]);
 
   useEffect(() => {
