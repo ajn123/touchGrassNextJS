@@ -3,196 +3,89 @@ const INTERNAL_API_URL = process.env.API_URL;
 const API_URL = process.env.API_URL;
 
 import { Event } from '@/types/event';
-import { DatingProfile, Match } from '@/types/datingProfile';
-import { Signup } from '@/types/signup';
-import { Question } from '@/types/question';
-import { getSession } from 'next-auth/react';
-import toast from 'react-hot-toast';
+import { connectToDB, disconnectFromDB, getDB } from './db';
+import { ObjectId } from 'mongodb';
 
-export const getEvent = async (event_id: string): Promise<Event | null> => {
+export const getEvent = async (event_id: string): Promise<any | null> => {
   try {
-    const url = typeof window === 'undefined' ? INTERNAL_API_URL : API_URL;
-    const response = await fetch(`${url}/api/events/${event_id}`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch event');
-    }
-    return response.json();
+    await connectToDB();
+    const db = await getDB();
+    const event = await db.db().collection('events').findOne({_id: new ObjectId(event_id)});
+    await disconnectFromDB();
+    return event;
   } catch (error) {
     console.error('Error fetching event:', error);
     return null;
   }
 };
 
-export const getEvents = async (): Promise<Event[]> => {
-  try {
-    const url = typeof window === 'undefined' ? INTERNAL_API_URL : API_URL;
-    console.log('Fetching from:', `${url}/api/events`);
-    
-    const response = await fetch(`${url}/api/events`, {
-      headers: {
-        'Accept': 'application/json',
-      },
-      cache: 'no-store'
-    });
-    
-    if (!response.ok) {
-      throw new Error('Failed to fetch events');
-    }
-    return response.json();
-  } catch (error) {
-    console.error('Error fetching events:', error);
-    return [];
-  }
+export const getEvents = async (): Promise<any[]> => {
+  await connectToDB();
+  const db = await getDB();
+  const events = await db.db().collection('events').find({}).toArray();
+  await disconnectFromDB();
+  return events;
 };
 
+export const getFeaturedEvents = async (): Promise<any[]> => {
 
-export const getFeaturedEvents = async (): Promise<Event[]> => {
-  try {
-    const url = typeof window === 'undefined' ? INTERNAL_API_URL : API_URL;
-    console.log('Fetching from:', `${url}/api/events/featured`);
-    const response = await fetch(`${url}/api/events/featured`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch featured events');
+    const db = await connectToDB();
+    if (!db) {
+        throw new Error('Failed to connect to database');
     }
-    return response.json();
-  } catch (error) {
-    console.error('Error fetching featured events:', error);
-    return [];
-  }
+    if (!db.db()) {
+        throw new Error('Failed to connect to database');
+    }
+    const events = await db.db().collection('events').find({schedules: {$exists: false}}).toArray();
+    console.log(`Retrieved ${events.length} events from database`);
+    await disconnectFromDB();
+    return events;
 };
 
 
 export const getCategories = async (): Promise<string[]> => {
-  try {
-    const url = typeof window === 'undefined' ? INTERNAL_API_URL : API_URL;
-    console.log('Fetching from:', `${url}/api/events/categories`);
-    const response = await fetch(`${url}/api/events/categories`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch categories');
-    }
-    return response.json();
-  } catch (error) {
-    console.error('Error fetching categories:', error);
-    return [];
+  
+  const db = await connectToDB();
+  if (!db) {
+    throw new Error('Failed to connect to database');
   }
+  const categories = await db.db().collection('events').distinct('category');
+  await disconnectFromDB();
+  return categories;
 };
 
 export const getCategory = async (category_id: string): Promise<Event[]> => {
-  try {
-    const url = typeof window === 'undefined' ? INTERNAL_API_URL : API_URL;
-    console.log('Fetching from:', `${url}/api/events/category/${category_id}`);
-    const response = await fetch(`${url}/api/events/category/${category_id}`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch category');
-    }
-    return response.json();
-  } catch (error) {
-    console.error('Error fetching category:', error);
-    return [];
+  
+  const db = await connectToDB();
+  if (!db) {
+    throw new Error('Failed to connect to database');
   }
+  const events = await db.db().collection('events').find({category: category_id}).toArray();
+  await disconnectFromDB();
+  return events.map((event: any) => ({
+    ...event,
+    _id: event._id.toString(),
+    schedules: event.schedules || []
+  }));
 };
 
-export const getRecurringEvents = async (): Promise<Event[]> => {
-  try {
-    const url = typeof window === 'undefined' ? INTERNAL_API_URL : API_URL;
-    console.log('Fetching from:', `${url}/api/events/recurring`);
-    const response = await fetch(`${url}/api/events/recurring`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch recurring events');
-    }
-    return response.json();
-  } catch (error) {
-    console.error('Error fetching recurring events:', error);
-    return [];
+export const getRecurringEvents = async (): Promise<any[]> => {
+  const db = await connectToDB();
+  if (!db) {
+    throw new Error('Failed to connect to database');
   }
+  const events = await db.db().collection('events').find({schedules: {$exists: true}}).toArray();
+  await disconnectFromDB();
+  return events;
 };
 
-export const createEvent = async (event: Omit<Event, '_id'>): Promise<Event> => {
-  const response = await fetch(`${API_URL}/api/events`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(event),
-  });
-  if (!response.ok) {
-    throw new Error('Failed to create event');
+export const createEvent = async (event: Omit<Event, '_id'>): Promise<any> => {
+  
+  const db = await connectToDB();
+  if (!db) {
+    throw new Error('Failed to connect to database');
   }
-  return response.json();
+  const newEvent = await db.db().collection('events').insertOne(event);
+  await disconnectFromDB();
+  return newEvent;
 }; 
-
-export const createDatingProfile = async (dating_profile: DatingProfile): Promise<DatingProfile> => {
-    console.log('Creating dating profile:', process.env.NEXT_PUBLIC_ENVIRONMENT);
-    console.log('Creating dating profile:', API_URL);
-  const response = await fetch(`${API_URL}/api/dating`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(dating_profile),
-  });
-  if (!response.ok) {
-    throw new Error('Failed to create dating profile');
-  }
-  return response.json();
-};
-
-export const getMatchProfiles = async (): Promise<Match[]> => {
-  const response = await fetch(`${API_URL}/api/dating/matches`);
-  if (!response.ok) {
-    throw new Error('Failed to fetch match profiles');
-  }
-  return response.json();
-};
-
-
-export const getUnmatchedProfiles = async (): Promise<DatingProfile[]> => {
-  const response = await fetch(`${API_URL}/api/dating/unmatched`);
-  if (!response.ok) {
-    throw new Error('Failed to fetch unmatched profiles');
-  }
-  return response.json();
-};
-
-export const signupForDating = async (signup: Signup): Promise<Signup> => {
-  const response = await fetch(`${API_URL}/api/dating/signup`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(signup),
-  });
-  return response.json();
-};
-
-export const getQuestions = async (): Promise<Question[]> => {
-  const response = await fetch(`${API_URL}/api/questions`);
-  if (!response.ok) {
-    throw new Error('Failed to fetch questions');
-  }
-  return response.json();
-};
-
-
-
-export const submitAnswers = async (questions: Question[]): Promise<Question[]> => {
-  const session = await getSession();
-  const url = typeof window === 'undefined' ? INTERNAL_API_URL : API_URL;
-
-
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/questions/submit`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-    body: JSON.stringify(questions),
-  });
-
-  if (!response.ok) {
-    throw new Error('Failed to submit answers');
-  }
-
-  const data = await response.json();
-  return data;
-};
