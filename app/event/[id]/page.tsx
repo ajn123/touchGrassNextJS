@@ -8,16 +8,16 @@ interface Schedule {
   days: string[];
 }
 
-
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
-  searchParams: { [key: string]: string | string[] | undefined };
+  }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
-export default async function EventPage({ params }: Promise<PageProps>) {
-    const event = await getEvent((await params).id);
+export default async function EventPage({ params }: PageProps) {
+    const resolvedParams = await params;
+    const event = await getEvent(resolvedParams.id);
     
     if (!event) {
         return <div>Event not found</div>;
