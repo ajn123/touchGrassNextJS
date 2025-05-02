@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import QuestionAnswer from './questionAnswer';
-import { submitAnswers } from '@/services/api';
 import { Question } from '@/types/question';
 import { toast } from 'react-hot-toast';
 
@@ -30,15 +29,15 @@ export default function QuestionForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    try {
-      const result = await submitAnswers(questions);
-      console.log("Result:", result);
-      toast.success('Your answers have been submitted successfully!');
+    // try {
+    //   //const result = await submitAnswers(questions);
+    //   console.log("Result:", result);
+    //   toast.success('Your answers have been submitted successfully!');
       
-    } catch (error) {
-      toast.error('Failed to submit answers. Please try again.');
-      console.error('Error submitting answers:', error);
-    }
+    // } catch (error) {
+    //   toast.error('Failed to submit answers. Please try again.');
+    //   console.error('Error submitting answers:', error);
+    // }
   };
 
   const handleNext = () => {

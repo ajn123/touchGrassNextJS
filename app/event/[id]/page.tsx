@@ -2,8 +2,21 @@ import { getEvent } from "@/services/api";
 import SocialMediaIcon from "@/components/buttons/socialMedia/socialMediaIcon";
 import DateHeader from "@/components/dates/dateHeader";
 import Image from "next/image";
-export type paramsType = Promise<{ id: string }>;
-export default async function EventPage({ params }: { params: paramsType } ) {
+
+interface Schedule {
+  time: string;
+  days: string[];
+}
+
+
+interface PageProps {
+  params: {
+    id: string;
+  };
+  searchParams: { [key: string]: string | string[] | undefined };
+}
+
+export default async function EventPage({ params }: Promise<PageProps>) {
     const event = await getEvent((await params).id);
     
     if (!event) {
@@ -35,7 +48,7 @@ export default async function EventPage({ params }: { params: paramsType } ) {
                 </div>
                 <DateHeader {...event} />
                 {
-                    event.schedules && event.schedules.map((schedule) => (
+                    event.schedules && event.schedules.map((schedule: Schedule) => (
                       <div key={schedule.time + schedule.days.join(", ")}>
                         <p className="text-gray-600 my-4 underline">{schedule.time} on {schedule.days.join(", ")}</p>
                       </div>
