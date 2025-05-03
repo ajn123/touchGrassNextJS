@@ -3,15 +3,16 @@ const INTERNAL_API_URL = process.env.API_URL;
 const API_URL = process.env.API_URL;
 
 import { Event } from '@/types/event';
-import { connectToDB, disconnectFromDB, getDB } from './db';
+import { connectToDB, getDB } from './db';
 import { ObjectId } from 'mongodb';
 
 export const getEvent = async (event_id: string): Promise<any | null> => {
   try {
-    await connectToDB();
     const db = await getDB();
+    if (!db) {
+      throw new Error('Failed to connect to database');
+    }
     const event = await db.db().collection('events').findOne({_id: new ObjectId(event_id)});
-    await disconnectFromDB();
     return event;
   } catch (error) {
     console.error('Error fetching event:', error);
@@ -20,48 +21,39 @@ export const getEvent = async (event_id: string): Promise<any | null> => {
 };
 
 export const getEvents = async (): Promise<any[]> => {
-  await connectToDB();
   const db = await getDB();
+  if (!db) {
+    throw new Error('Failed to connect to database');
+  }
   const events = await db.db().collection('events').find({}).toArray();
-  await disconnectFromDB();
   return events;
 };
 
 export const getFeaturedEvents = async (): Promise<any[]> => {
-
-    const db = await connectToDB();
-    if (!db) {
-        throw new Error('Failed to connect to database');
-    }
-    if (!db.db()) {
-        throw new Error('Failed to connect to database');
-    }
-    const events = await db.db().collection('events').find({schedules: {$exists: false}}).toArray();
-    console.log(`Retrieved ${events.length} events from database`);
-    await disconnectFromDB();
-    return events;
+  const db = await getDB();
+  if (!db) {
+    throw new Error('Failed to connect to database');
+  }
+  const events = await db.db().collection('events').find({schedules: {$exists: false}}).toArray();
+  console.log(`Retrieved ${events.length} events from database`);
+  return events;
 };
 
-
 export const getCategories = async (): Promise<string[]> => {
-  
-  const db = await connectToDB();
+  const db = await getDB();
   if (!db) {
     throw new Error('Failed to connect to database');
   }
   const categories = await db.db().collection('events').distinct('category');
-  await disconnectFromDB();
   return categories;
 };
 
 export const getCategory = async (category_id: string): Promise<Event[]> => {
-  
-  const db = await connectToDB();
+  const db = await getDB();
   if (!db) {
     throw new Error('Failed to connect to database');
   }
   const events = await db.db().collection('events').find({category: category_id}).toArray();
-  await disconnectFromDB();
   return events.map((event: any) => ({
     ...event,
     _id: event._id.toString(),
@@ -70,22 +62,19 @@ export const getCategory = async (category_id: string): Promise<Event[]> => {
 };
 
 export const getRecurringEvents = async (): Promise<any[]> => {
-  const db = await connectToDB();
+  const db = await getDB();
   if (!db) {
     throw new Error('Failed to connect to database');
   }
   const events = await db.db().collection('events').find({schedules: {$exists: true}}).toArray();
-  await disconnectFromDB();
   return events;
 };
 
 export const createEvent = async (event: Omit<Event, '_id'>): Promise<any> => {
-  
-  const db = await connectToDB();
+  const db = await getDB();
   if (!db) {
     throw new Error('Failed to connect to database');
   }
   const newEvent = await db.db().collection('events').insertOne(event);
-  await disconnectFromDB();
   return newEvent;
 }; 
