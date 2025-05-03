@@ -50,6 +50,16 @@ export default function Navbar() {
             >
               About
             </Link>
+            <Link
+              href="/contact"
+              className={`navbar-link ${
+                pathname === '/contact'
+                ? 'navbar-link-active'
+                : 'navbar-link'
+              }`}
+            >
+              Contact
+            </Link>
             {/* <Link
               href="/dating"
               className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ml-8 ${

@@ -9,10 +9,21 @@ export const connectToDB = async () => {
   }
 
   if (isConnecting) {
-    // Wait for the connection to be established
+    // This block only executes if another connection attempt is already in progress
+    // On the first connection attempt, isConnecting is false, so this block is skipped
+    // and execution continues to the try/finally block below where the actual connection happens
+    
+    // For subsequent concurrent connection attempts, this creates a waiting mechanism
     while (isConnecting) {
+      // Pause execution for 100ms using a Promise-based timeout
+      // This prevents tight CPU-bound loops while waiting
       await new Promise(resolve => setTimeout(resolve, 100));
     }
+    
+    // Once isConnecting becomes false (set in the finally block of the first connection),
+    // the while loop exits and we return the now-established client connection
+    // This is not an infinite loop because the first connection attempt will eventually
+    // set isConnecting to false in its finally block, allowing all waiting calls to proceed
     return client;
   }
 

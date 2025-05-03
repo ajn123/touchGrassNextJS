@@ -20,6 +20,14 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+.navbar-link {
+  @apply inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ml-8 text-black;
+}
+
+.navbar-link-active {
+  @apply border-indigo-500 text-gray-900;
+}
+
 
 @layer components {
   .social-icon {
@@ -35,3 +43,4 @@ body {
     @apply inline-block px-2 py-1 mr-1 bg-gray-200 text-gray-700 rounded-full text-xs py-2;
   }
 }
+
