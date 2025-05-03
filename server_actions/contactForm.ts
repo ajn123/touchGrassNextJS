@@ -1,6 +1,6 @@
 'use server'
 import { getDB } from "@/services/db";
-
+import { FormState } from "@/types/formState";
 
 
 export async function saveFeedback(prevState: FormState, formData: FormData): Promise<FormState> {

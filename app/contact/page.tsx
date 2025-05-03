@@ -1,15 +1,7 @@
 'use client'
 import { saveFeedback } from "@/server_actions/contactForm";
+import { FormState } from "@/types/formState";
 import { useActionState } from "react";
-
-type FormState = {
-    message: string;
-    errors: {
-        name: string | null;
-        email: string | null;
-        message: string | null;
-    };
-};
 
 const initialState: FormState = {
     message: "",
