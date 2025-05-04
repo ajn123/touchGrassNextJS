@@ -5,6 +5,8 @@ import RecurringEvent from '../components/events/recurringEvent';
 import Link from 'next/link';
 export default async function Home() {
   const events = await getFeaturedEvents();
+
+  console.log(events);
   const categories = await getCategories();
   return (
     <main className="min-h-screen bg-background">
