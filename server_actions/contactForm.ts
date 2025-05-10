@@ -4,8 +4,6 @@ import { FormState } from "@/types/formState";
 
 
 export async function saveFeedback(prevState: FormState, formData: FormData): Promise<FormState> {
-    "use server";
-    
     const name = formData.get("name");
     const email = formData.get("email");
     const message = formData.get("message");

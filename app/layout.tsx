@@ -3,7 +3,7 @@ import "./globals.css";
 import Navbar from '@/components/layout/Navbar';
 
 export const metadata: Metadata = {
-  title: "Events DC",
+  title: "Touch Grass DC",
   description: "Discover events in the District of Columbia",
 };
 

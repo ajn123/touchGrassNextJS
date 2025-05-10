@@ -5,7 +5,7 @@ if (!process.env.MONGODB_URI) {
     throw new Error('Invalid/Missing environment variable: "MONGODB_URI"');
 }
 
-const uri = "mongodb+srv://ajn123:BSlydZDpyKfMT5Ti@cluster0.tal5l.mongodb.net/touchGrassDC?tls=true&tlsAllowInvalidCertificates=false&retryWrites=true&w=majority";
+const uri = process.env.MONGODB_URI;
 console.log('MongoDB URI format check:', uri.startsWith('mongodb://') || uri.startsWith('mongodb+srv://'));
 
 const options = {};

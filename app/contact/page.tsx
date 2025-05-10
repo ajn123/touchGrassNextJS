@@ -1,7 +1,8 @@
 'use client'
 import { saveFeedback } from "@/server_actions/contactForm";
 import { FormState } from "@/types/formState";
-import { useActionState } from "react";
+import { useActionState,  startTransition, useOptimistic } from "react";
+import { Toaster, toast } from "react-hot-toast";
 
 const initialState: FormState = {
     message: "",
@@ -12,23 +13,72 @@ const initialState: FormState = {
     }
 };
 
-
 export default function ContactPage() {
     const [state, formAction] = useActionState(saveFeedback, initialState);
 
+    const [optimisticState, updateOptimisticState] = useOptimistic(initialState, () => {
+        return {
+            message: "Sending...",
+            errors: {
+                name: null,
+                email: null,
+                message: null
+            }
+        };  
+    });
+
+    const handleSubmit = (formData: FormData) => {
+        updateOptimisticState(() => {
+            return {
+                message: "Sending...",
+                errors: {
+                    name: null,
+                    email: null,
+                    message: null
+                }
+            };
+        });
+
+        startTransition(async () => {
+            await formAction(formData);
+            toast.success('Feedback submitted successfully!', {
+                duration: 3000,
+                position: 'top-right',
+                style: {
+                    background: '#10B981',
+                    color: '#fff',
+                },
+            });
+        });
+    }
+
     return (
         <div className="flex flex-col items-center justify-center min-h-screen p-4">
+            <Toaster position="top-center" reverseOrder={false} />
             <h1 className="text-4xl font-bold mb-8">Contact</h1>
-
-            {state.message && (
+            {optimisticState.message.includes("success") && (
                 <div className={`w-full max-w-md mb-4 p-4 rounded-md ${
-                    state.message.includes("success") ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                    optimisticState.message.includes("success") ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
                 }`}>
-                    {state.message}
+                    {optimisticState.message}
                 </div>
             )}
+            {
+                optimisticState.message.includes("Sending") && (
+                    <div className={`w-full max-w-md mb-4 p-4 rounded-md bg-yellow-200 text-black`}>
+                        {optimisticState.message}
+                    </div>
+                )
+            }
+            {
+                optimisticState.message.includes("error") && (
+                    <div className={`w-full max-w-md mb-4 p-4 rounded-md bg-red-100 text-red-700`}>
+                        {optimisticState.message}
+                    </div>
+                )
+            }
 
-            <form action={formAction} className="w-full max-w-md space-y-4">
+            <form action={handleSubmit} className="w-full max-w-md space-y-4">
                 <div>
                     <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1 text-white">
                         Name
