@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-
+import { SocialIcon } from 'react-social-icons';
 export default function Navbar() {
   const pathname = usePathname();
 
@@ -60,22 +60,15 @@ export default function Navbar() {
             >
               Contact
             </Link>
-            {/* <Link
-              href="/dating"
-              className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ml-8 ${
-                pathname === '/dating'
-                  ? 'border-rose-500 text-gray-900'
-                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-              }`}
-            >
-              <span className="flex items-center">
-                Dating
-                <span className="ml-1 px-2 py-0.5 bg-rose-100 text-rose-600 text-xs rounded-full">
-                  Free
-                </span>
-              </span>
-            </Link> */}
+
+            <Link href="https://www.instagram.com/touchgrassdc/" className="navbar-link">
+              <SocialIcon network="instagram" style={{ width: 30, height: 30 }} />
+            </Link>
+
+            
           </div>
+
+      
 
           {/* <div className="flex items-center space-x-4">
             {status === 'loading' ? (
