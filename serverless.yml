@@ -1,0 +1,27 @@
+service: events-dc-email
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-1
+  environment:
+    RECIPIENT_EMAIL: ${env:RECIPIENT_EMAIL}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - ses:SendEmail
+            - ses:SendRawEmail
+          Resource: "*"
+
+functions:
+  sendEmail:
+    handler: functions/sendEmail.handler
+    events:
+      - http:
+          path: send-email
+          method: post
+          cors: true
+    environment:
+      RECIPIENT_EMAIL: ${env:RECIPIENT_EMAIL} 

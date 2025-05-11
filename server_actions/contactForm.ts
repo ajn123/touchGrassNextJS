@@ -1,8 +1,7 @@
 'use server'
 import { getDB } from "@/services/db";
 import { FormState } from "@/types/formState";
-
-
+import { sendEmail } from "./email";
 export async function saveFeedback(prevState: FormState, formData: FormData): Promise<FormState> {
     const name = formData.get("name");
     const email = formData.get("email");
@@ -31,6 +30,8 @@ export async function saveFeedback(prevState: FormState, formData: FormData): Pr
             message,
             createdAt: new Date(),
         });
+
+        sendEmail(formData);
 
         return {
             message: "Message sent successfully!",
