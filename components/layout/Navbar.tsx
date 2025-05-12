@@ -61,9 +61,9 @@ export default function Navbar() {
               Contact
             </Link>
 
-            <Link href="https://www.instagram.com/touchgrassdc/" className="navbar-link">
-              <SocialIcon network="instagram" style={{ width: 30, height: 30 }} />
-            </Link>
+              <SocialIcon network="instagram" className="navbar-link mt-2" 
+              url="https://www.instagram.com/touchgrassdc/"
+              />
 
             
           </div>
