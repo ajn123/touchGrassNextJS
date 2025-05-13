@@ -7,10 +7,20 @@ interface ErrorWithStatusCode extends Error {
 }
 
 export const handler = async (event: any) => {
-    console.log('Received event:', JSON.stringify(event, null, 2));
+    // Log the full event and environment
+    console.log('=== LAMBDA EXECUTION START ===');
+    console.log('Event:', JSON.stringify(event, null, 2));
+    console.log('Environment:', {
+        AWS_REGION: process.env.AWS_REGION,
+        RECIPIENT_EMAIL: process.env.RECIPIENT_EMAIL ? 'Set' : 'Not set',
+        NODE_ENV: process.env.NODE_ENV,
+        LAMBDA_TASK_ROOT: process.env.LAMBDA_TASK_ROOT,
+        AWS_EXECUTION_ENV: process.env.AWS_EXECUTION_ENV
+    });
 
     // Handle CORS preflight requests
     if (event.httpMethod === 'OPTIONS') {
+        console.log('Handling OPTIONS request');
         return {
             statusCode: 200,
             headers: {
@@ -25,16 +35,20 @@ export const handler = async (event: any) => {
 
     try {
         if (!event.body) {
+            console.error('No body in request');
             throw new Error('No body provided in request');
         }
 
         const { name, email, message } = JSON.parse(event.body);
+        console.log('Parsed request body:', { name, email, message });
         
         if (!name || !email || !message) {
+            console.error('Missing required fields');
             throw new Error('Missing required fields');
         }
 
         if (!process.env.RECIPIENT_EMAIL) {
+            console.error('RECIPIENT_EMAIL not set in environment');
             throw new Error('RECIPIENT_EMAIL environment variable not set');
         }
 
@@ -49,22 +63,21 @@ export const handler = async (event: any) => {
                 },
                 Body: {
                     Text: {
-                        Data: `
-                            Name: ${name}
-                            Email: ${email}
-                            Message: ${message}
-                        `,
+                        Data: `Name: ${name}\nEmail: ${email}\nMessage: ${message}`,
                     },
                 },
             },
         };
 
-        console.log('Sending email with params:', JSON.stringify(params, null, 2));
+        console.log('SES Parameters:', JSON.stringify(params, null, 2));
+        console.log('SES Client Config:', JSON.stringify(ses.config, null, 2));
 
         const command = new SendEmailCommand(params);
+        console.log('Attempting to send email...');
         const result = await ses.send(command);
         
         console.log('Email sent successfully:', JSON.stringify(result, null, 2));
+        console.log('=== LAMBDA EXECUTION SUCCESS ===');
 
         return {
             statusCode: 200,
@@ -80,7 +93,12 @@ export const handler = async (event: any) => {
             }),
         };
     } catch (error) {
-        console.error('Error details:', error);
+        console.error('=== LAMBDA EXECUTION ERROR ===');
+        console.error('Error name:', (error as Error).name);
+        console.error('Error message:', (error as Error).message);
+        console.error('Error stack:', (error as Error).stack);
+        console.error('Full error object:', JSON.stringify(error, null, 2));
+        
         const typedError = error as ErrorWithStatusCode;
         
         return {

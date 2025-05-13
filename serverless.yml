@@ -6,6 +6,7 @@ provider:
   region: us-east-1
   environment:
     RECIPIENT_EMAIL: ${env:RECIPIENT_EMAIL}
+    NODE_ENV: ${opt:stage, 'dev'}
   iam:
     role:
       statements:
@@ -13,7 +14,13 @@ provider:
           Action:
             - ses:SendEmail
             - ses:SendRawEmail
-          Resource: "*"
+          Resource: "arn:aws:ses:${self:provider.region}:*:identity/*"
+        - Effect: Allow
+          Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+          Resource: "arn:aws:logs:${self:provider.region}:*:log-group:/aws/lambda/*"
 
 functions:
   sendEmail:
@@ -24,4 +31,6 @@ functions:
           method: post
           cors: true
     environment:
-      RECIPIENT_EMAIL: ${env:RECIPIENT_EMAIL} 
+      RECIPIENT_EMAIL: ${env:RECIPIENT_EMAIL}
+    timeout: 30
+    memorySize: 256
