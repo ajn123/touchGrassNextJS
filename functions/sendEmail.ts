@@ -1,12 +1,17 @@
 import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
 
-const ses = new SESClient({ region: process.env.AWS_REGION });
-
 interface ErrorWithStatusCode extends Error {
     statusCode?: number;
 }
 
 export const handler = async (event: any) => {
+    // Create a new SES client for each request
+    const ses = new SESClient({ 
+        region: process.env.AWS_REGION,
+        maxAttempts: 3,
+        retryMode: 'standard'
+    });
+
     // Log the full event and environment
     console.log('=== LAMBDA EXECUTION START ===');
     console.log('Event:', JSON.stringify(event, null, 2));
@@ -74,24 +79,29 @@ export const handler = async (event: any) => {
 
         const command = new SendEmailCommand(params);
         console.log('Attempting to send email...');
-        const result = await ses.send(command);
         
-        console.log('Email sent successfully:', JSON.stringify(result, null, 2));
-        console.log('=== LAMBDA EXECUTION SUCCESS ===');
+        try {
+            const result = await ses.send(command);
+            console.log('Email sent successfully:', JSON.stringify(result, null, 2));
+            console.log('=== LAMBDA EXECUTION SUCCESS ===');
 
-        return {
-            statusCode: 200,
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Headers': 'Content-Type',
-                'Access-Control-Allow-Methods': 'POST,OPTIONS',
-                'Access-Control-Allow-Credentials': true,
-            },
-            body: JSON.stringify({ 
-                message: 'Email sent successfully',
-                messageId: result.MessageId 
-            }),
-        };
+            return {
+                statusCode: 200,
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Headers': 'Content-Type',
+                    'Access-Control-Allow-Methods': 'POST,OPTIONS',
+                    'Access-Control-Allow-Credentials': true,
+                },
+                body: JSON.stringify({ 
+                    message: 'Email sent successfully',
+                    messageId: result.MessageId 
+                }),
+            };
+        } catch (sesError: any) {
+            console.error('SES Error:', sesError);
+            throw new Error(`Failed to send email: ${sesError.message || 'Unknown error'}`);
+        }
     } catch (error) {
         console.error('=== LAMBDA EXECUTION ERROR ===');
         console.error('Error name:', (error as Error).name);
@@ -114,5 +124,8 @@ export const handler = async (event: any) => {
                 error: typedError.toString()
             }),
         };
+    } finally {
+        // Clean up the SES client
+        await ses.destroy();
     }
 }; 
