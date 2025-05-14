@@ -6,7 +6,6 @@ provider:
   region: us-east-1
   environment:
     RECIPIENT_EMAIL: ${env:RECIPIENT_EMAIL}
-    NODE_ENV: ${opt:stage, 'dev'}
   iam:
     role:
       statements:
