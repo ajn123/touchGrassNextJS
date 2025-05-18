@@ -8,7 +8,13 @@ if (!process.env.MONGODB_URI) {
 const uri = process.env.MONGODB_URI;
 console.log('MongoDB URI format check:', uri.startsWith('mongodb://') || uri.startsWith('mongodb+srv://'));
 
-const options = {};
+const options = {
+    ssl: true,
+    tls: true,
+    tlsAllowInvalidCertificates: false,
+    retryWrites: true,
+    w: 'majority'
+};
 
 let client: MongoClient | null = null;
 let isConnecting = false;
