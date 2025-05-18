@@ -13,7 +13,7 @@ const options = {
     tls: true,
     tlsAllowInvalidCertificates: false,
     retryWrites: true,
-    w: 'majority'
+    w: 'majority' as const
 };
 
 let client: MongoClient | null = null;
