@@ -10,7 +10,7 @@ export async function sendEmail(formData: FormData) {
     }
 
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/dev/send-email`, {
+        const response = await fetch(`${process.env.API_URL}/dev/send-email`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
