@@ -20,6 +20,7 @@ export async function sendEmail(formData: FormData) {
                 email,
                 message,
             }),
+            cache: 'no-store',
         });
 
         const data = await response.json();

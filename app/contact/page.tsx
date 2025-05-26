@@ -4,6 +4,8 @@ import { FormState } from "@/types/formState";
 import { useActionState,  startTransition, useOptimistic } from "react";
 import { Toaster, toast } from "react-hot-toast";
 
+export const dynamic = 'force-dynamic'
+
 const initialState: FormState = {
     message: "",
     errors: {
