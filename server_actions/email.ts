@@ -1,6 +1,10 @@
 'use server'
+import { unstable_noStore as noStore } from 'next/cache'
 
 export async function sendEmail(formData: FormData) {
+    // Disable caching for this function
+    noStore()
+
     const name = formData.get('name') as string;
     const email = formData.get('email') as string;
     const message = formData.get('message') as string;
