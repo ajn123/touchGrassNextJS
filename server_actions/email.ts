@@ -21,8 +21,8 @@ export async function sendEmail(formData: FormData) {
             },
             body: JSON.stringify({
                 name,
-                email,
-                message,
+                email: "hello@touchgrassdc.com",
+                message: `Hello, this is a test email from ${name} with email ${email} and message ${message}`,
             }),
             cache: 'no-store',
         });

@@ -1,131 +1,68 @@
-import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
-
-interface ErrorWithStatusCode extends Error {
-    statusCode?: number;
-}
-
+import { SESv2Client, SendEmailCommand } from "@aws-sdk/client-sesv2";
 export const handler = async (event: any) => {
-    // Create a new SES client for each request
-    const ses = new SESClient({ 
-        region: process.env.AWS_REGION,
-        maxAttempts: 3,
-        retryMode: 'standard'
-    });
 
-    // Log the full event and environment
-    console.log('=== LAMBDA EXECUTION START ===');
-    console.log('Event:', JSON.stringify(event, null, 2));
-    console.log('Environment:', {
-        AWS_REGION: process.env.AWS_REGION,
-        RECIPIENT_EMAIL: process.env.RECIPIENT_EMAIL ? 'Set' : 'Not set',
-        NODE_ENV: process.env.NODE_ENV,
-        LAMBDA_TASK_ROOT: process.env.LAMBDA_TASK_ROOT,
-        AWS_EXECUTION_ENV: process.env.AWS_EXECUTION_ENV
-    });
+        const body = JSON.parse(event.body);
+        const { name, email, message } = body;
 
-    // Handle CORS preflight requests
-    if (event.httpMethod === 'OPTIONS') {
-        console.log('Handling OPTIONS request');
-        return {
-            statusCode: 200,
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Headers': 'Content-Type',
-                'Access-Control-Allow-Methods': 'POST,OPTIONS',
-                'Access-Control-Allow-Credentials': true,
-            },
-            body: '',
-        };
-    }
-
-    try {
-        if (!event.body) {
-            console.error('No body in request');
-            throw new Error('No body provided in request');
-        }
-
-        const { name, email, message } = JSON.parse(event.body);
-        console.log('Parsed request body:', { name, email, message });
-        
         if (!name || !email || !message) {
-            console.error('Missing required fields');
-            throw new Error('Missing required fields');
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ error: 'All fields are required' })
+            };
         }
 
-        if (!process.env.RECIPIENT_EMAIL) {
-            console.error('RECIPIENT_EMAIL not set in environment');
-            throw new Error('RECIPIENT_EMAIL environment variable not set');
-        }
+        const ses = new SESv2Client({ 
+            region: process.env.AWS_REGION,
+            maxAttempts: 3,
+            retryMode: 'standard'
+        });
 
-        const params = {
-            Source: process.env.RECIPIENT_EMAIL,
+        try {
+
+
+            const command = new SendEmailCommand({
+                FromEmailAddress: email,
             Destination: {
-                ToAddresses: [process.env.RECIPIENT_EMAIL],
+                ToAddresses: [process.env.RECIPIENT_EMAIL as string],
             },
-            Message: {
-                Subject: {
-                    Data: `New Contact Form Submission from ${name}`,
-                },
-                Body: {
-                    Text: {
-                        Data: `Name: ${name}\nEmail: ${email}\nMessage: ${message}`,
+            Content: {
+                Simple: {
+                    Subject: {
+                        Data: `New Contact Form Submission from ${name}`,
+                    },
+                    Body: {
+                        Text: {
+                            Data: `
+                                Name: ${name}
+                                Email: ${email}
+                                Message: ${message}
+                            `,
+                        },
                     },
                 },
             },
-        };
+        });
 
-        console.log('SES Parameters:', JSON.stringify(params, null, 2));
-        console.log('SES Client Config:', JSON.stringify(ses.config, null, 2));
-
-        const command = new SendEmailCommand(params);
-        console.log('Attempting to send email...');
-        
-        try {
-            const result = await ses.send(command);
-            console.log('Email sent successfully:', JSON.stringify(result, null, 2));
-            console.log('=== LAMBDA EXECUTION SUCCESS ===');
-
-            return {
-                statusCode: 200,
-                headers: {
-                    'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Headers': 'Content-Type',
-                    'Access-Control-Allow-Methods': 'POST,OPTIONS',
-                    'Access-Control-Allow-Credentials': true,
-                },
-                body: JSON.stringify({ 
-                    message: 'Email sent successfully',
-                    messageId: result.MessageId 
-                }),
-            };
-        } catch (sesError: any) {
-            console.error('SES Error:', sesError);
-            throw new Error(`Failed to send email: ${sesError.message || 'Unknown error'}`);
-        }
-    } catch (error) {
-        console.error('=== LAMBDA EXECUTION ERROR ===');
-        console.error('Error name:', (error as Error).name);
-        console.error('Error message:', (error as Error).message);
-        console.error('Error stack:', (error as Error).stack);
-        console.error('Full error object:', JSON.stringify(error, null, 2));
-        
-        const typedError = error as ErrorWithStatusCode;
+        const response = await ses.send(command);
         
         return {
-            statusCode: typedError.statusCode || 500,
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Headers': 'Content-Type',
-                'Access-Control-Allow-Methods': 'POST,OPTIONS',
-                'Access-Control-Allow-Credentials': true,
-            },
+            statusCode: 200,
             body: JSON.stringify({ 
-                message: typedError.message || 'Failed to send email',
-                error: typedError.toString()
-            }),
+                success: true, 
+                messageId: response.MessageId 
+            })
+        };
+    } catch (error) {
+        console.error('Error sending email:', error);
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ 
+                error: 'Failed to send email',
+                message: error instanceof Error ? error.message : 'Unknown error'
+            })
         };
     } finally {
-        // Clean up the SES client
+        // Clean up
         await ses.destroy();
     }
-}; 
+};
