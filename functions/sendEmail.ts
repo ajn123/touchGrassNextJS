@@ -11,58 +11,29 @@ export const handler = async (event: any) => {
             };
         }
 
-        const ses = new SESv2Client({ 
-            region: process.env.AWS_REGION,
-            maxAttempts: 3,
-            retryMode: 'standard'
-        });
-
         try {
-
-
-            const command = new SendEmailCommand({
-                FromEmailAddress: email,
-            Destination: {
-                ToAddresses: [process.env.RECIPIENT_EMAIL as string],
-            },
-            Content: {
-                Simple: {
-                    Subject: {
-                        Data: `New Contact Form Submission from ${name}`,
-                    },
-                    Body: {
-                        Text: {
-                            Data: `
-                                Name: ${name}
-                                Email: ${email}
-                                Message: ${message}
-                            `,
-                        },
-                    },
+            const response = await fetch(`${process.env.API_URL}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
                 },
-            },
-        });
-
-        const response = await ses.send(command);
-        
-        return {
-            statusCode: 200,
-            body: JSON.stringify({ 
-                success: true, 
-                messageId: response.MessageId 
-            })
-        };
-    } catch (error) {
-        console.error('Error sending email:', error);
-        return {
-            statusCode: 500,
-            body: JSON.stringify({ 
-                error: 'Failed to send email',
-                message: error instanceof Error ? error.message : 'Unknown error'
-            })
-        };
-    } finally {
-        // Clean up
-        await ses.destroy();
-    }
+                body: JSON.stringify({
+                    name,
+                    email: "hello@touchgrassdc.com",
+                    message: `Hello, this is a test email from ${name} with email ${email} and message ${message}`,
+                }),
+                cache: 'no-store',
+            });
+    
+            const data = await response.json();
+    
+            if (!response.ok) {
+                throw new Error(data.message || 'Failed to send email');
+            }
+    
+            return { success: true, messageId: data.messageId };
+        } catch (error) {
+            console.error('Error sending email:', error);
+            throw error instanceof Error ? error : new Error('Failed to send email');
+        }
 };
