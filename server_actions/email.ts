@@ -14,15 +14,15 @@ export async function sendEmail(formData: FormData) {
     }
 
     try {
-        const response = await fetch(`${process.env.API_URL}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
                 name,
-                email: "hello@touchgrassdc.com",
-                message: `Hello, this is a test email from ${name} with email ${email} and message ${message}`,
+                email,
+                message,
             }),
             cache: 'no-store',
         });
@@ -30,7 +30,7 @@ export async function sendEmail(formData: FormData) {
         const data = await response.json();
 
         if (!response.ok) {
-            throw new Error(data.message || 'Failed to send email');
+            throw new Error(data.detail || 'Failed to send email');
         }
 
         return { success: true, messageId: data.messageId };
