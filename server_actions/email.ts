@@ -14,7 +14,7 @@ export async function sendEmail(formData: FormData) {
     }
 
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}`, {
+        const response = await fetch(`https://tqt20jyts2.execute-api.us-east-1.amazonaws.com/dev/send-email`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
