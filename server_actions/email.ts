@@ -22,7 +22,7 @@ export async function sendEmail(formData: FormData) {
             body: JSON.stringify({
                 name,
                 email: 'hello@touchgrassdc.com',
-                message,
+                message: `${name} - ${email} - ${message}`,
             })
         });
 
