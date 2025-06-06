@@ -1,5 +1,6 @@
 'use server'
 import { unstable_noStore as noStore } from 'next/cache'
+import axios from 'axios';
 
 export async function sendEmail(formData: FormData) {
     // Disable caching for this function
@@ -14,27 +15,38 @@ export async function sendEmail(formData: FormData) {
     }
 
     try {
-        const response = await fetch(`https://tqt20jyts2.execute-api.us-east-1.amazonaws.com/dev/send-email`, {
+        const response = await axios({
             method: 'POST',
+            url: `https://tqt20jyts2.execute-api.us-east-1.amazonaws.com/dev/send-email`,
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
+            data: {
                 name,
                 email: 'hello@touchgrassdc.com',
                 message: `${name} - ${email} - ${message}`,
-            })
+            },
+            timeout: 10000, // 10 second timeout
         });
 
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(data.detail || 'Failed to send email');
-        }
-
-        return { success: true, messageId: data.messageId };
+        return { success: true, messageId: response.data.messageId };
     } catch (error) {
         console.error('Error sending email:', error);
-        throw error instanceof Error ? error : new Error('Failed to send email');
+        
+        if (axios.isAxiosError(error)) {
+            if (error.code === 'ECONNABORTED') {
+                throw new Error('Request timed out. Please try again.');
+            }
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                throw new Error(error.response.data.detail || 'Failed to send email');
+            } else if (error.request) {
+                // The request was made but no response was received
+                throw new Error('No response from server. Please try again later.');
+            }
+        }
+        
+        throw new Error('Failed to send email. Please try again later.');
     }
 } 
