@@ -14,10 +14,6 @@ export async function sendEmail(formData: FormData) {
     }
 
     try {
-        // Add timeout to the fetch request
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
-
         const response = await fetch(`https://tqt20jyts2.execute-api.us-east-1.amazonaws.com/dev/send-email`, {
             method: 'POST',
             headers: {
@@ -27,38 +23,18 @@ export async function sendEmail(formData: FormData) {
                 name,
                 email: 'hello@touchgrassdc.com',
                 message: `${name} - ${email} - ${message}`,
-            }),
-            signal: controller.signal,
-            // Add additional fetch options for better reliability
-            cache: 'no-store',
-            next: { revalidate: 0 }
+            })
         });
 
-        clearTimeout(timeoutId);
+        const data = await response.json();
 
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
+            throw new Error(data.detail || 'Failed to send email');
         }
 
-        const data = await response.json();
         return { success: true, messageId: data.messageId };
     } catch (error) {
         console.error('Error sending email:', error);
-        
-        // More specific error handling
-        if (error instanceof Error) {
-            if (error.name === 'AbortError') {
-                throw new Error('Request timed out. Please try again.');
-            }
-            if (error.message.includes('ETIMEDOUT')) {
-                throw new Error('Connection timed out. Please check your internet connection and try again.');
-            }
-            if (error.message.includes('ECONNREFUSED')) {
-                throw new Error('Could not connect to the server. Please try again later.');
-            }
-        }
-        
-        throw new Error('Failed to send email. Please try again later.');
+        throw error instanceof Error ? error : new Error('Failed to send email');
     }
 } 
